@@ -1,4 +1,4 @@
-import { XCircle, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export default function CompatibilityShowcase() {
   return (

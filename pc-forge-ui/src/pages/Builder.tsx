@@ -39,60 +39,59 @@ export default function Builder() {
               icon: "02",
               required: ["cpu"]
           },
-          { 
-              label: "Motherboard", 
-              category: "motherboard", 
-              value: motherboard, 
-              params: (cpu?.product_id || (cpu as any)?.id) ? `&cpu_id=${cpu?.product_id || (cpu as any)?.id}` : "",
-              icon: "03",
-              required: ["cpu"]
-          },
-          { 
-              label: "Memory (RAM)", 
-              category: "ram", 
-              value: ram, 
-              params: (motherboard?.product_id || (motherboard as any)?.id) ? `&motherboard_id=${motherboard?.product_id || (motherboard as any)?.id}` : "",
-              icon: "04",
-              required: ["motherboard"]
-          },
-          { 
-              label: "Storage", 
-              category: "storage", 
-              value: storage, 
-              params: (motherboard?.product_id || (motherboard as any)?.id) ? `&motherboard_id=${motherboard?.product_id || (motherboard as any)?.id}` : "",
-              icon: "05",
-              required: ["motherboard"]
-          },
-          { 
-              label: "Power Supply", 
-              category: "psu", 
-              value: psu, 
-              params: (cpu?.product_id || (cpu as any)?.id) && (gpu?.product_id || (gpu as any)?.id) 
-                  ? `&cpu_id=${cpu?.product_id || (cpu as any)?.id}&gpu_id=${gpu?.product_id || (gpu as any)?.id}` 
-                  : "",
-              icon: "06",
-              required: ["cpu", "gpu"]
-          },
-          { 
-              label: "Chassis (Case)", 
-              category: "case", 
-              value: chassis, 
-              params: (motherboard?.product_id || (motherboard as any)?.id) 
-                  ? `&motherboard_id=${motherboard?.product_id || (motherboard as any)?.id}${gpu?.product_id || (gpu as any)?.id ? `&gpu_id=${gpu?.product_id || (gpu as any)?.id}` : ""}` 
-                  : "",
-              icon: "07",
-              required: ["motherboard", "gpu"]
-          }    ];
-  
-    const summaryItems = slots
-      .filter(s => s.value)
-      .map(s => ({
-          id: s.value?.product_id || (s.value as any)?.id || "unknown",
-          name: s.value?.product_name || (s.value as any)?.name || "Unknown Component",
-          price: s.value?.price_pkr,
-          category: s.label
-      }));
-  
+                    {
+                        label: "Motherboard",
+                        category: "motherboard",
+                        value: motherboard,
+                        params: (cpu?.id || cpu?.product_id) ? `&cpu_id=${cpu?.id || cpu?.product_id}` : "",
+                        icon: "03",
+                        required: ["cpu"]
+                    },
+                    {
+                        label: "Memory (RAM)",
+                        category: "ram",
+                        value: ram,
+                        params: (motherboard?.id || motherboard?.product_id) ? `&motherboard_id=${motherboard?.id || motherboard?.product_id}` : "",
+                        icon: "04",
+                        required: ["motherboard"]
+                    },
+                    {
+                        label: "Storage",
+                        category: "storage",
+                        value: storage,
+                        params: (motherboard?.id || motherboard?.product_id) ? `&motherboard_id=${motherboard?.id || motherboard?.product_id}` : "",
+                        icon: "05",
+                        required: ["motherboard"]
+                    },
+                    {
+                        label: "Power Supply",
+                        category: "psu",
+                        value: psu,
+                        params: (cpu?.id || cpu?.product_id) && (gpu?.id || gpu?.product_id) 
+                            ? `&cpu_id=${cpu?.id || cpu?.product_id}&gpu_id=${gpu?.id || gpu?.product_id}` 
+                            : "",
+                        icon: "06",
+                        required: ["cpu", "gpu"]
+                    },
+                    {
+                        label: "Chassis (Case)",
+                        category: "case",
+                        value: chassis,
+                        params: (motherboard?.id || motherboard?.product_id) 
+                            ? `&motherboard_id=${motherboard?.id || motherboard?.product_id}${gpu?.id || gpu?.product_id ? `&gpu_id=${gpu?.id || gpu?.product_id}` : ""}` 
+                            : "",
+                        icon: "07",
+                        required: ["motherboard", "gpu"]
+                    }    ];
+            
+              const summaryItems = slots
+                .filter(s => s.value)
+                .map(s => ({
+                    id: s.value?.id || s.value?.product_id || "unknown",
+                    name: s.value?.name || s.value?.product_name || "Unknown Component",
+                    price: s.value?.price_pkr ?? null,
+                    category: s.label
+                }));  
     const totalPrice = summaryItems.reduce((sum, item) => sum + (item.price || 0), 0);
   
     return (
@@ -133,9 +132,9 @@ export default function Builder() {
                                           </h3>
                                           {slot.value ? (
                                               <div className="space-y-1">
-                                                  <div className="text-sm font-black uppercase leading-tight">{slot.value?.product_name || (slot.value as any)?.name}</div>
+                                                  <div className="text-sm font-black uppercase leading-tight">{slot.value.name || slot.value.product_name}</div>
                                                   <div className="text-[10px] font-bold text-gray-400 font-mono italic">
-                                                      ID: {(slot.value?.product_id || (slot.value as any)?.id || "").substring(0, 8)}... • Rs. {slot.value?.price_pkr?.toLocaleString()}
+                                                      ID: {(slot.value.id || slot.value.product_id || "").substring(0, 8)}... • Rs. {slot.value.price_pkr?.toLocaleString()}
                                                   </div>
                                               </div>
                                           ) : (

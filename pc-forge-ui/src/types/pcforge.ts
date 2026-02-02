@@ -88,6 +88,10 @@ export interface Component {
   id: string;
   category: string;
   name: string;
+  product_id?: string; // For compatibility
+  product_name?: string; // For compatibility
+  vendor?: string; // For compatibility
+  url?: string; // For compatibility
   specs: Record<string, any>;
   price_pkr: number | null;
   image_url: string | null;

@@ -1,4 +1,3 @@
-import type { PriceResponse } from "../types/pcforge";
 
 interface SummaryItem {
     id: string;

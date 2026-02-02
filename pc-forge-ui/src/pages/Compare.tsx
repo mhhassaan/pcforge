@@ -20,7 +20,6 @@ export default function Compare() {
   const [products, setProducts] = useState<Component[]>([]);
   const [searchResults, setSearchResults] = useState<Component[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalProducts, setModalProducts] = useState<Component[]>([]);
@@ -46,14 +45,11 @@ export default function Compare() {
       return;
     }
 
-    setIsSearching(true);
     try {
       const data = await fetchComponents(selectedCategory.value, query);
       setSearchResults(data.slice(0, 5));
     } catch (e) {
       console.error(e);
-    } finally {
-      setIsSearching(false);
     }
   };
 
@@ -196,7 +192,7 @@ export default function Compare() {
                         
                         <div className="mt-auto pt-4 border-t border-gray-100">
                              <a 
-                                href={product.url} 
+                                href={product.url || product.prices?.[0]?.url || "#"} 
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center justify-center gap-2 w-full py-2 bg-black hover:bg-blue-600 text-white rounded-none text-[9px] font-black uppercase tracking-[0.2em] transition-colors"
@@ -232,7 +228,7 @@ export default function Compare() {
                             </div>
                             {products.map(product => (
                                 <div key={product.id} className={`col-span-1 p-5 text-base font-black border-r border-black last:border-0 ${row.color || 'text-black'} font-mono`}>
-                                    {row.format((product as any)[row.key])}
+                                    {row.format(product[row.key as keyof Component])}
                                 </div>
                             ))}
                         </div>
@@ -298,7 +294,7 @@ export default function Compare() {
                                         <div className="text-[10px] font-black text-blue-600 font-mono">
                                             {product.price_pkr ? `Rs. ${product.price_pkr.toLocaleString()}` : 'Price TBD'}
                                         </div>
-                                        <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5">{product.vendor || 'Unknown Source'}</div>
+                                        <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5">{product.vendor || product.prices?.[0]?.vendor || 'Unknown Source'}</div>
                                     </div>
                                 </div>
                                 {isAlreadyAdded ? (

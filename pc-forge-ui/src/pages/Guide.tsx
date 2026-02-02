@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookOpen, Cpu, Monitor, Zap, Briefcase, MousePointer, X, TrendingUp, HelpCircle, AlertTriangle } from 'lucide-react';
+import { BookOpen, Cpu, Monitor, Briefcase, MousePointer, X, TrendingUp, HelpCircle, AlertTriangle } from 'lucide-react';
 import AssemblyFlow from '../components/AssemblyFlow';
 
 // --- Data Structures ---
