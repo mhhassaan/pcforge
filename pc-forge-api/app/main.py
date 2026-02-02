@@ -22,11 +22,16 @@ from app.repositories.case_repo import get_compatible_cases
 from app.services.case_service import format_cases
 from app.repositories.component_repo import get_components_by_category, get_filter_options
 
+import os
+
 app = FastAPI(title="PC Forge API")
+
+# Allow origins from environment variable or default to localhost
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

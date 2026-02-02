@@ -1,6 +1,6 @@
 import type { CPU, Motherboard, RAM, GPU, Case, PSU, Storage, PriceResponse, Component } from "../types/pcforge";
 
-const API = "http://127.0.0.1:8000";
+const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 export async function fetchComponents(
   category: string, 
