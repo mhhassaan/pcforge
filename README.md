@@ -12,11 +12,10 @@ PC Forge is a comprehensive full-stack application designed to simplify the PC b
 
 ## Project Structure
 
-The repository is organized into three main components:
+The repository is organized into two main components:
 
 - **`pc-forge-api/`**: The FastAPI backend providing the compatibility logic and database integration.
 - **`pc-forge-ui/`**: A high-performance React frontend built with Vite and Tailwind CSS.
-- **`frontend/`**: A modern Next.js implementation utilizing the App Router and Framer Motion for enhanced interactivity.
 
 ## Tech Stack
 
@@ -27,10 +26,10 @@ The repository is organized into three main components:
 - **Validation:** [Pydantic](https://docs.pydantic.dev/)
 - **Driver:** `psycopg2-binary`
 
-### Frontend (Vite & Next.js)
-- **Frameworks:** [React 19](https://react.dev/), [Next.js 15](https://nextjs.org/)
+### Frontend (Vite)
+- **Framework:** [React 19](https://react.dev/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Animations:** [Framer Motion](https://www.framer.com/motion/), [Anime.js](https://animejs.com/)
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
 - **Icons:** [Lucide React](https://lucide.dev/)
 - **UI Components:** [Radix UI](https://www.radix-ui.com/)
 
@@ -64,21 +63,17 @@ The repository is organized into three main components:
    ```
    API Docs: `http://localhost:8000/docs`
 
-### 2. Frontend Setup
+### 2. Frontend Setup (`pc-forge-ui`)
 
-#### Option A: Vite Development (`pc-forge-ui`)
-```bash
-cd pc-forge-ui
-npm install
-npm run dev
-```
-
-#### Option B: Next.js Development (`frontend`)
-```bash
-cd frontend
-npm install
-npm run dev
-```
+1. Navigate to the frontend directory:
+   ```bash
+   cd pc-forge-ui
+   ```
+2. Install dependencies and run development server:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
 ## Architecture Overview
 
