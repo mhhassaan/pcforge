@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ArrowRight, Lock, Mail, User, ShieldCheck } from 'lucide-react';
-import Cubes from '@/components/ui/Cubes';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,17 +19,6 @@ export default function Auth() {
       {/* Background Effect */}
       <div className="absolute inset-0 z-0">
         <div style={{ height: '100%', width: '100%', position: 'relative' }}>
-          <Cubes 
-            gridSize={17}
-            maxAngle={75}
-            radius={5}
-            borderStyle="1.5px solid #000"
-            faceColor="transparent"
-            rippleColor="#2563EB"
-            rippleSpeed={1.5}
-            autoAnimate
-            rippleOnClick
-          />
         </div>
       </div>
 

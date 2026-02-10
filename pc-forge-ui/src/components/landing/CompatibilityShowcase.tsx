@@ -55,9 +55,9 @@ export default function CompatibilityShowcase() {
                     <span className="text-[10px] font-black uppercase text-gray-400">PROCESSOR</span>
                     <span className="text-xs font-black uppercase">RYZEN 7 7800X3D</span>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-200">
-                    <span className="text-[10px] font-black uppercase text-gray-400">MOTHERBOARD</span>
-                    <span className="text-xs font-black uppercase">MSI B650 TOMAHAWK</span>
+                <div className="flex items-center justify-between p-4 bg-green-50  border border-green-200">
+                    <span className="text-[10px] font-black uppercase text-green-600">MOTHERBOARD</span>
+                    <span className="text-xs font-black uppercase text-green-600 underline">MSI B650 TOMAHAWK</span>
                 </div>
             </div>
 
