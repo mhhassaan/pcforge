@@ -41,7 +41,7 @@ export default function Gallery() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 md:py-40">
-            <Loader2 size={32} md:size={48} className="animate-spin text-blue-600 mb-4" />
+            <Loader2 size={48} className="animate-spin text-blue-600 mb-4" />
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Accessing Hardware Archives...</p>
           </div>
         ) : builds.length > 0 ? (
@@ -49,7 +49,7 @@ export default function Gallery() {
               {builds.map((build) => (
                   <div key={build.id} className="group border-2 border-black bg-white hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all flex flex-col min-w-0">
                       <div className="aspect-[4/3] bg-gray-50 border-b-2 border-black relative flex items-center justify-center overflow-hidden flex-shrink-0">
-                          <Camera size={40} md:size={48} className="text-gray-200 group-hover:scale-110 transition-transform duration-500" />
+                          <Camera size={48} className="text-gray-200 group-hover:scale-110 transition-transform duration-500" />
                           <div className="absolute top-3 left-3 bg-black text-white px-2 py-1 text-[8px] font-black uppercase tracking-widest">
                               Ref: {build.id.toString().padStart(4, '0')}
                           </div>
