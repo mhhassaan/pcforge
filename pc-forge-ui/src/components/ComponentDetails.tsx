@@ -28,11 +28,11 @@ export default function ComponentDetails({ component, onClose, onAddOverride }: 
   };
 
   return (
-    <div className="h-full flex flex-col bg-white overflow-y-auto scrollbar-thin">
-      <div className="sticky top-0 z-10 bg-white p-4 border-b border-black flex justify-between items-center">
-        <h2 className="text-[10px] font-black text-black uppercase tracking-tight truncate pr-4 italic">{component.name}</h2>
-        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors">
-          <X size={18} />
+    <div className="h-full flex flex-col bg-white overflow-y-auto scrollbar-thin min-w-0">
+      <div className="sticky top-0 z-10 bg-white p-4 border-b border-black flex justify-between items-center min-w-0">
+        <h2 className="text-[11px] md:text-xs font-black text-black uppercase tracking-tight truncate pr-4">{component.name}</h2>
+        <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-none text-black border border-transparent hover:border-black transition-all flex-shrink-0">
+          <X size={20} />
         </button>
       </div>
 

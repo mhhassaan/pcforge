@@ -117,6 +117,7 @@ def get_components_by_category(category: str, search_query: str = None, filters:
         p.product_name,
         p.manufacturer,
         p.category,
+        p.image_url,
         MIN(v.price) as price_pkr,
         json_agg(
             json_build_object(
@@ -146,7 +147,7 @@ def get_components_by_category(category: str, search_query: str = None, filters:
             sql += f" AND {prefix}.{col} IN ({','.join(['%s'] * len(values))})"
             params.extend(values)
 
-    sql += " GROUP BY p.product_id, s.product_id"
+    sql += " GROUP BY p.product_id, s.product_id, p.image_url"
 
     cur.execute(sql, params)
     rows = cur.fetchall()
@@ -158,7 +159,7 @@ def get_components_by_category(category: str, search_query: str = None, filters:
         row_dict = dict(row)
         
         # Identification fields to keep at top level
-        base_fields = ["product_id", "product_name", "manufacturer", "category", "price_pkr", "all_prices"]
+        base_fields = ["product_id", "product_name", "manufacturer", "category", "price_pkr", "all_prices", "image_url"]
         
         for key, value in row_dict.items():
             if key not in base_fields:
@@ -171,7 +172,7 @@ def get_components_by_category(category: str, search_query: str = None, filters:
             "category": row["category"],
             "price_pkr": row["price_pkr"],
             "prices": row["all_prices"] or [],
-            "image_url": None, 
+            "image_url": row["image_url"], 
             "specs": spec_data
         })
 

@@ -22,37 +22,59 @@ const STEPS = [
     { 
         title: "Install RAM", 
         desc: "Open the clips on slots 2 and 4 (usually). Align the notch. Push down firmly until you hear a satisfying 'CLICK'.", 
-        imgs: ["https://placehold.co/800x600/ffffff/black?text=RAM+Install"] 
+        imgs: [
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-21-ram-installation-original-rwd:1920-1080?wid=1920&hei=1080",
+             "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-22-ram-installation-original-rwd:1920-1080?wid=1920&hei=1080"
+            ] 
     },
     { 
         title: "Install M.2 SSD", 
         desc: "Remove the heat sink screw. Insert the SSD at a 30-degree angle. Push down and secure with the screw or latch.", 
-        imgs: ["https://placehold.co/800x600/ffffff/black?text=SSD+Install"] 
+        imgs: [
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-15-install-ssd-original-rwd:1920-1080?wid=1920&hei=1080",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-16-install-ssd-original-rwd:1920-1080?wid=1920&hei=1080",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-17-install-ssd-16x9-rwd1:1920-1080?wid=1920&hei=1080"
+        ] 
     },
     { 
         title: "Mount CPU Cooler", 
         desc: "CRITICAL: Remove the plastic peel from the cooler base! Apply a pea-sized dot of thermal paste if not pre-applied. Screw in a star pattern.", 
-        imgs: ["https://placehold.co/800x600/ffffff/black?text=Cooler+Mount"] 
+        imgs: [
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-19-cpu-thermal-paste-application-original-rwd:1920-1080?wid=1072&hei=603",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-18a-install-cpu-cooling-original-rwd:1920-1080?wid=1072&hei=603",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-18a-install-cpu-cooling-original-rwd:1920-1080?wid=1072&hei=603"
+        ] 
     },
     { 
         title: "Case Prep & Mobo Install", 
         desc: "Install the I/O shield (if separate). Screw in standoffs. Lower motherboard in and screw it down. Don't over-tighten.", 
-        imgs: ["https://placehold.co/800x600/ffffff/black?text=Case+Install"] 
+        imgs: [
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-26-install-motherboard-original-rwd:1920-1080?wid=1072&hei=603",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-28-install-motherboard-original-rwd:1920-1080?wid=1072&hei=603"
+        ] 
     },
     { 
         title: "Power Supply & Cables", 
         desc: "Install PSU. Route the 24-pin (Motherboard) and 8-pin (CPU) cables through the back. Connect them now—it's tight later.", 
-        imgs: ["https://placehold.co/800x600/ffffff/black?text=PSU+Cables"] 
+        imgs: [
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-24-power-supply-install-original-rwd:1920-1080?wid=1920&hei=1080",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-25-power-supply-install-original-rwd:1920-1080?wid=1920&hei=1080"] 
     },
     { 
         title: "Install Graphics Card", 
         desc: "Remove the back PCIe slot covers. Open the PCIe latch. Push GPU in until it clicks. Screw it into the bracket.", 
-        imgs: ["https://placehold.co/800x600/ffffff/black?text=GPU+Install"] 
+        imgs: [
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-30-install-gpu-original-rwd:1920-1080?wid=1920&hei=1080",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-31-install-gpu-0589-screw-original-rwd:1920-1080?wid=1920&hei=1080"
+        ] 
     },
     { 
         title: "Cable Management & Boot", 
         desc: "Plug in GPU power. Tidy up cables with zip ties. Connect monitor to GPU (not Mobo!). Power on and mash DELETE for BIOS.", 
-        imgs: ["https://placehold.co/800x600/ffffff/black?text=Boot+Up"] 
+        imgs: [
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-32-install-storage-original-rwd:1920-1080?wid=1920&hei=1080",
+            "https://intelcorp.scene7.com/is/image/intelcorp/s9-u05-40-screenshot-of-operating-system-original-rwd:1920-1080?wid=1920&hei=1080"
+        ] 
     }
 ];
 

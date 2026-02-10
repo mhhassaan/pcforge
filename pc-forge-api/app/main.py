@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from app.schemas import BuildRequest, BuildValidationResponse
 from app.repositories.build_repo import validate_build
 from app.services.build_validator import build_validation_result
 from app.repositories.ram_repo import get_compatible_ram
@@ -15,12 +14,13 @@ from app.repositories.storage_repo import get_compatible_storage
 from app.services.storage_service import format_storage
 from app.repositories.price_repo import get_cheapest_prices
 from app.services.price_service import format_price_summary
-from app.schemas import PriceRequest
 from app.repositories.cpu_repo import get_all_cpus
 from app.services.cpu_service import format_cpus
 from app.repositories.case_repo import get_compatible_cases
 from app.services.case_service import format_cases
 from app.repositories.component_repo import get_components_by_category, get_filter_options
+from app.schemas import BuildRequest, BuildValidationResponse, PriceRequest, GalleryBuildCreate
+from app.services.gallery_service import create_gallery_entry, fetch_gallery_builds, fetch_build_details
 
 import os
 
@@ -36,6 +36,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/api/gallery")
+def get_gallery():
+    return fetch_gallery_builds()
+
+@app.get("/api/gallery/{build_id}")
+def get_gallery_build(build_id: int):
+    build = fetch_build_details(build_id)
+    if not build:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Build not found")
+    return build
+
+@app.post("/api/gallery")
+def save_to_gallery(build: GalleryBuildCreate):
+    new_id = create_gallery_entry(build.dict())
+    return {"id": new_id, "message": "Build saved to gallery"}
 
 @app.get("/api/components")
 def fetch_components(request: Request, category: str, q: str = None):
@@ -63,52 +80,23 @@ def get_cpus():
     return {"cpus": format_cpus(rows)}
 
 @app.get("/api/compatible/cases")
-
 def compatible_cases(motherboard_id: str = None, gpu_id: str = None):
-
     if not motherboard_id and not gpu_id:
-
         rows = get_components_by_category("case")
-
         return {
-
             "motherboard_id": motherboard_id,
-
             "gpu_id": gpu_id,
-
             "count": len(rows),
-
             "cases": rows
-
         }
 
-
-
-        data = get_compatible_cases(motherboard_id, gpu_id)
-
-
-
-        return {
-
-
-
-            "motherboard_id": motherboard_id,
-
-
-
-            "gpu_id": gpu_id,
-
-
-
-            "count": len(data),
-
-
-
-            "cases": data
-
-
-
-        }
+    data = get_compatible_cases(motherboard_id, gpu_id)
+    return {
+        "motherboard_id": motherboard_id,
+        "gpu_id": gpu_id,
+        "count": len(data),
+        "cases": data
+    }
 
 @app.post("/api/build/validate", response_model=BuildValidationResponse)
 def validate_pc_build(build: BuildRequest):
@@ -139,52 +127,21 @@ def compatible_ram(motherboard_id: str = None):
         "ram": data
     }
 
-
 @app.get("/api/compatible/motherboards")
-
-
 def compatible_motherboards(cpu_id: str = None):
-
-
     if not cpu_id:
-
-
         rows = get_components_by_category("motherboard")
-
-
         return {
-
-
             "cpu_id": cpu_id,
-
-
             "count": len(rows),
-
-
             "motherboards": rows
-
-
         }
 
-
-
-
-
     data = get_compatible_motherboards(cpu_id)
-
-
     return {
-
-
         "cpu_id": cpu_id,
-
-
         "count": len(data),
-
-
         "motherboards": data
-
-
     }
 
 @app.get("/api/compatible/gpus")

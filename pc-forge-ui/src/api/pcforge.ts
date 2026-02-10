@@ -1,6 +1,25 @@
-import type { CPU, Motherboard, RAM, GPU, Case, PSU, Storage, PriceResponse, Component } from "../types/pcforge";
+import type { CPU, Motherboard, RAM, GPU, Case, PSU, Storage, PriceResponse, Component, GalleryBuild, GalleryBuildCreate } from "../types/pcforge";
 
 const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+export async function fetchGallery(): Promise<GalleryBuild[]> {
+  const res = await fetch(`${API}/api/gallery`);
+  return res.json();
+}
+
+export async function fetchGalleryBuild(id: number): Promise<GalleryBuild> {
+  const res = await fetch(`${API}/api/gallery/${id}`);
+  return res.json();
+}
+
+export async function saveToGallery(build: GalleryBuildCreate): Promise<{ id: number; message: string }> {
+  const res = await fetch(`${API}/api/gallery`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(build),
+  });
+  return res.json();
+}
 
 export async function fetchComponents(
   category: string, 

@@ -25,67 +25,70 @@ export default function ComponentGrid({ components, selectedId, onSelect, onAddO
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-      {components.map((component) => (
-        <div 
-          key={component.id} 
-          className={`bg-white rounded-none border transition-all cursor-pointer group flex flex-col ${
-            selectedId === component.id 
-            ? 'border-blue-600 ring-1 ring-blue-600 shadow-[4px_4px_0px_0px_rgba(37,99,235,1)]' 
-            : 'border-black hover:border-blue-600'
-          }`}
-          onClick={() => onSelect(component)}
-        >
-          <div className="aspect-[4/1] bg-gray-50 relative rounded-none overflow-hidden border-b border-gray-100">
-            {component.image_url ? (
-              <img 
-                src={component.image_url} 
-                alt={component.name}
-                className="w-full h-full object-contain opacity-50 group-hover:opacity-100 transition-opacity p-2"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="opacity-20">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                  <line x1="8" y1="21" x2="16" y2="21"></line>
-                  <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg>
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-4 overflow-hidden">
+        {components.map((component) => (
+          <div 
+            key={component.id} 
+            className={`bg-white rounded-none border-2 transition-all cursor-pointer group flex flex-col min-w-0 ${
+              selectedId === component.id 
+              ? 'border-blue-600 ring-1 ring-blue-600 shadow-[4px_4px_0px_0px_rgba(37,99,235,1)]' 
+              : 'border-black hover:border-blue-600'
+            }`}
+            onClick={() => onSelect(component)}
+          >
+            <div className="aspect-square md:aspect-[3/2] bg-gray-50 relative rounded-none overflow-hidden border-b-2 border-black flex-shrink-0">
+              {component.image_url ? (
+                <img 
+                  src={component.image_url} 
+                  alt={component.name}
+                  className="w-full h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity p-2 md:p-3"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="opacity-20 md:w-6 md:h-6">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                </div>
+              )}
+              <div className="absolute top-1 right-1 md:top-2 md:right-2 bg-black text-white px-1.5 md:px-2 py-0.5 text-[8px] md:text-[10px] font-black uppercase tracking-widest italic">
+                {component.category}
               </div>
-            )}
-            <div className="absolute top-2 right-2 bg-black text-white px-2 py-0.5 text-[8px] font-black uppercase tracking-widest">
-              {component.category}
-            </div>
-          </div>
-          
-          <div className="p-4 flex-1 flex flex-col">
-            <h3 className="font-black text-[10px] text-black mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors uppercase tracking-tight">
-              {component.name}
-            </h3>
-            
-            <div className="space-y-1.5 mb-4 flex-1">
-                {Object.entries(component.specs || {}).slice(0, 2).map(([key, value]) => (
-                    <div key={key} className="flex justify-between text-[8px] uppercase tracking-wider">
-                        <span className="text-gray-400 font-black">{key.replace(/_/g, ' ')}:</span>
-                        <span className="font-black text-black truncate max-w-[60%] text-right">{String(value)}</span>
-                    </div>
-                ))}
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-              <span className="text-xs font-black text-blue-600 font-mono">
-                {component.price_pkr ? `RS. ${component.price_pkr.toLocaleString()}` : 'N/A'}
-              </span>
-              <button 
+            <div className="p-2 md:p-4 flex-1 flex flex-col min-w-0">
+              <h3 className="font-black text-[10px] md:text-sm text-black mb-2 md:mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors uppercase tracking-tighter leading-tight break-words">
+                {component.name}
+              </h3>
+
+              <div className="space-y-1 md:space-y-1.5 mb-3 md:mb-4 flex-1 min-w-0">
+                {Object.entries(component.specs || {}).slice(0, 2).map(([key, value]) => (
+                  <div key={key} className="flex justify-between items-center text-[8px] md:text-[10px] uppercase tracking-tight gap-1">
+                    <span className="text-gray-400 font-black italic whitespace-nowrap">{key.replace(/_/g, ' ').substring(0, 8)}:</span>
+                    <span className="font-black text-black truncate text-right">{String(value)}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col gap-2 md:gap-3 pt-2 md:pt-3 border-t-2 border-black mt-auto">
+                <span className="text-[10px] md:text-lg font-black text-blue-600 font-mono truncate">
+                  {component.price_pkr ? `RS. ${component.price_pkr.toLocaleString()}` : 'PRICE_TBD'}
+                </span>
+                <button 
                   onClick={(e) => handleAdd(component, e)}
-                  className="bg-black text-white px-3 py-1.5 rounded-none text-[9px] font-black hover:bg-blue-600 transition-colors uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-              >
-                SELECT
-              </button>
+                  className="w-full bg-black text-white py-1.5 md:py-3 rounded-none text-[8px] md:text-[10px] font-black hover:bg-blue-600 transition-all uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,0.1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5"
+                >
+                  DEPLOY
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+        ))}
+      </div>
+    );
+
+  }
+
+  

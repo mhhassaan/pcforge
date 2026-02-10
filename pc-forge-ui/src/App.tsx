@@ -6,6 +6,8 @@ import Guide from './pages/Guide';
 import Compare from './pages/Compare';
 import Components from './pages/Components';
 import Gallery from './pages/Gallery';
+import GalleryBuildDetails from './pages/GalleryBuildDetails';
+import Auth from './pages/Auth';
 import { BuildProvider } from './context/BuildContext';
 
 function App() {
@@ -20,7 +22,8 @@ function App() {
             <Route path="compare" element={<Compare />} />
             <Route path="guide" element={<Guide />} />
             <Route path="gallery" element={<Gallery />} />
-            <Route path="login" element={<div className="p-8 text-white">Login Page (Coming Soon)</div>} />
+            <Route path="gallery/:id" element={<GalleryBuildDetails />} />
+            <Route path="login" element={<Auth />} />
           </Route>
         </Routes>
       </BrowserRouter>

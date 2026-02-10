@@ -97,3 +97,40 @@ export interface Component {
   image_url: string | null;
   prices: PriceListing[];
 }
+
+export interface GalleryBuild {
+  id: number;
+  title: string;
+  description: string;
+  cpu_id: string;
+  motherboard_id: string;
+  ram_id: string;
+  gpu_id: string;
+  psu_id: string;
+  case_id: string;
+  storage_id: string;
+  user_name: string;
+  total_price_pkr: number;
+  created_at: string;
+  cpu_name?: string;
+  gpu_name?: string;
+  case_name?: string;
+  motherboard_name?: string;
+  ram_name?: string;
+  psu_name?: string;
+  storage_name?: string;
+}
+
+export interface GalleryBuildCreate {
+  title: string;
+  description?: string;
+  cpu_id: string;
+  motherboard_id: string;
+  ram_id: string;
+  gpu_id: string;
+  psu_id: string;
+  case_id: string;
+  storage_id: string;
+  user_name?: string;
+  total_price_pkr?: number;
+}
