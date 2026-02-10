@@ -191,7 +191,7 @@ export default function Compare() {
                         onClick={() => removeFromCompare(product.id)}
                         className="absolute top-1 right-1 w-6 h-6 md:w-8 md:h-8 bg-black text-white flex items-center justify-center rounded-none hover:bg-red-600 transition-colors z-30 border-2 border-black"
                     >
-                        <Trash2 size={12} md:size={14} />
+                        <Trash2 size={14} />
                     </button>
 
                     <div className="aspect-square bg-gray-50 rounded-none mb-4 md:mb-6 flex items-center justify-center p-2 md:p-4 border border-gray-100 font-black text-gray-200 text-[8px] md:text-xs uppercase text-center overflow-hidden">
@@ -226,10 +226,11 @@ export default function Compare() {
                     onClick={openSelectionModal}
                     className="bg-gray-50 rounded-none border-2 border-dashed border-gray-200 flex items-center justify-center min-h-[250px] md:min-h-[350px] hover:border-black hover:bg-white transition-all group mx-1"
                 >
-                    <div className="text-center p-2 opacity-20 group-hover:opacity-100 transition-opacity">
-                        <Plus size={24} md:size={40} className="mx-auto text-black mb-2 md:mb-4" />
-                        <div className="text-[8px] md:text-[11px] font-black text-black uppercase tracking-[0.2em]">Insert</div>
-                    </div>
+                                            <div className="text-center p-2 opacity-20 group-hover:opacity-100 transition-opacity">
+                                                <Plus size={40} className="mx-auto text-black mb-2 md:mb-4" />
+                                                <div className="text-[8px] md:text-[11px] font-black text-black uppercase tracking-[0.2em]">Insert</div>
+                                            </div>
+                    
                 </button>
             ))}
         </div>

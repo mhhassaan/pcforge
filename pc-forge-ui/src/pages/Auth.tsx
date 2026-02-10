@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowRight, Lock, Mail, User, ShieldCheck } from 'lucide-react';
 import Cubes from '@/components/ui/Cubes';
 

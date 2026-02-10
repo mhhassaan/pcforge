@@ -48,13 +48,13 @@ export default function Builder() {
             title: formData.title || "Untitled Masterpiece",
             user_name: formData.user_name || "Anonymous",
             description: formData.description,
-            cpu_id: cpu.id || cpu.product_id,
-            motherboard_id: motherboard.id || motherboard.product_id,
-            ram_id: ram.id || ram.product_id,
-            gpu_id: gpu.id || gpu.product_id,
-            psu_id: psu.id || psu.product_id,
-            case_id: chassis.id || chassis.product_id,
-            storage_id: storage.id || storage.product_id,
+            cpu_id: (cpu?.id || cpu?.product_id) as string,
+            motherboard_id: (motherboard?.id || motherboard?.product_id) as string,
+            ram_id: (ram?.id || ram?.product_id) as string,
+            gpu_id: (gpu?.id || gpu?.product_id) as string,
+            psu_id: (psu?.id || psu?.product_id) as string,
+            case_id: (chassis?.id || chassis?.product_id) as string,
+            storage_id: (storage?.id || storage?.product_id) as string,
             total_price_pkr: totalPrice
         });
         alert("Build published successfully!");
