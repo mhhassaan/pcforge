@@ -133,5 +133,6 @@ export interface GalleryBuildCreate {
   case_id: string;
   storage_id: string;
   user_name?: string;
+  user_id?: number;
   total_price_pkr?: number;
 }

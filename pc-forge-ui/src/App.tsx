@@ -8,6 +8,8 @@ import Components from './pages/Components';
 import Gallery from './pages/Gallery';
 import GalleryBuildDetails from './pages/GalleryBuildDetails';
 import Auth from './pages/Auth';
+import AdminDashboard from './pages/AdminDashboard';
+import MyBuilds from './pages/MyBuilds';
 import { BuildProvider } from './context/BuildContext';
 
 function App() {
@@ -23,7 +25,9 @@ function App() {
             <Route path="guide" element={<Guide />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="gallery/:id" element={<GalleryBuildDetails />} />
+            <Route path="my-builds" element={<MyBuilds />} />
             <Route path="login" element={<Auth />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Route>
         </Routes>
       </BrowserRouter>

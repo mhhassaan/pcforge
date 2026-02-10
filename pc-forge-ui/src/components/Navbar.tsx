@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Hammer, Monitor, Cpu, Image as ImageIcon, Menu, X, BookOpen, ChevronDown, Layout, Zap, HardDrive, Box } from 'lucide-react';
-import { useState } from 'react';
+import { Hammer, Monitor, Cpu, Image as ImageIcon, Menu, X, BookOpen, ChevronDown, Layout, Zap, HardDrive, Box, ShieldCheck, LogOut, Folder } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 const CATEGORIES = [
   { label: 'Processors', value: 'cpu', icon: Cpu },
@@ -18,20 +18,47 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isComponentsHovered, setIsComponentsHovered] = useState(false);
   const [isMobileSubMenuOpen, setIsMobileSubMenuOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  // Check for admin status
+  const userStr = localStorage.getItem('pcforge_user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const isAdmin = user?.email?.endsWith('@pcforge.pk');
+
+  // Auto-close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsMobileSubMenuOpen(false);
+  }, [pathname]);
+
+  // Calculate nav offset for full-width dropdown
+  useEffect(() => {
+    const updateOffset = () => {
+      if (navRef.current) {
+        const rect = navRef.current.getBoundingClientRect();
+        navRef.current.style.setProperty('--nav-offset', `${rect.left}px`);
+      }
+    };
+    updateOffset();
+    window.addEventListener('resize', updateOffset);
+    return () => window.removeEventListener('resize', updateOffset);
+  }, []);
 
   const isActive = (path: string) => pathname === path;
 
   const navLinks = [
+    ...(isAdmin ? [{ name: 'Admin', href: '/admin', icon: ShieldCheck }] : []),
     { name: 'Components', href: '/components', icon: Cpu, dropdown: true },
     { name: 'Builder', href: '/builder', icon: Hammer },
     { name: 'Compare', href: '/compare', icon: Monitor },
     { name: 'Guide', href: '/guide', icon: BookOpen },
     { name: 'Gallery', href: '/gallery', icon: ImageIcon },
+    ...(user ? [{ name: 'My Builds', href: '/my-builds', icon: Folder }] : []),
   ];
 
   return (
     <nav className="sticky top-0 z-[200] w-full bg-white/80 backdrop-blur-md border-b border-black font-sans text-black">
-      <div className="w-full mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+      <div ref={navRef} className="w-full mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <div className="bg-black text-white p-1.5 rounded-none transition-transform group-hover:rotate-90">
@@ -63,31 +90,6 @@ export default function Navbar() {
                   >
                     {link.name} <ChevronDown size={12} className={`transition-transform ${isComponentsHovered ? 'rotate-180' : ''}`} />
                   </Link>
-
-                  {/* Horizontal Full-Width Dropdown */}
-                  {isComponentsHovered && (
-                    <div className="absolute top-full left-0 w-full bg-white border-b-4 border-black shadow-[0px_16px_20px_rgba(0,0,0,0.1)] p-8 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="max-w-[1400px] mx-auto grid grid-cols-7 gap-4">
-                        {CATEGORIES.map((cat) => {
-                          const Icon = cat.icon;
-                          return (
-                            <Link
-                              key={cat.value}
-                              to={`/components?category=${cat.value}`}
-                              className="group/item flex flex-col items-center text-center p-4 border-2 border-transparent hover:border-black transition-all bg-gray-50 hover:bg-white"
-                            >
-                              <div className="mb-4 text-gray-300 group-hover/item:text-blue-600 transition-colors">
-                                <Icon size={32} strokeWidth={1.5} />
-                              </div>
-                              <span className="text-[10px] font-black text-black uppercase tracking-widest leading-tight italic">
-                                {cat.label}
-                              </span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             }
@@ -108,12 +110,21 @@ export default function Navbar() {
 
         {/* Action Buttons */}
         <div className="hidden md:flex items-center gap-4">
-          <Link
-            to="/login"
-            className="text-[10px] font-black px-6 py-2.5 rounded-none transition-all hover:bg-gray-100 uppercase tracking-widest border border-black italic"
-          >
-            Sign In
-          </Link>
+          {user ? (
+            <button
+              onClick={() => { localStorage.removeItem('pcforge_user'); localStorage.removeItem('admin_access'); window.location.reload(); }}
+              className="text-[10px] font-black px-6 py-2.5 rounded-none transition-all hover:bg-red-50 text-red-600 border border-black uppercase tracking-widest italic flex items-center gap-2"
+            >
+              Sign Out <LogOut size={14} />
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="text-[10px] font-black px-6 py-2.5 rounded-none transition-all hover:bg-gray-100 uppercase tracking-widest border border-black italic"
+            >
+              Sign In
+            </Link>
+          )}
           <Link
             to="/builder"
             className="bg-black text-white text-[10px] font-black px-6 py-2.5 rounded-none transition-all hover:bg-blue-600 uppercase tracking-widest border border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]"
@@ -129,6 +140,35 @@ export default function Navbar() {
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
+
+        {/* Horizontal Dropdown (Limited to Navbar Width) */}
+        <div 
+          onMouseEnter={() => setIsComponentsHovered(true)}
+          onMouseLeave={() => setIsComponentsHovered(false)}
+          className={`absolute top-[calc(100%)] left-0 w-full bg-white border-b-4 border-black shadow-[0px_16px_20px_rgba(0,0,0,0.1)] p-8 transition-all duration-300 hidden md:block z-[-1] ${
+            isComponentsHovered ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+          }`}
+        >
+          <div className="grid grid-cols-7 gap-2">
+            {CATEGORIES.map((cat) => {
+              const Icon = cat.icon;
+              return (
+                <Link
+                  key={cat.value}
+                  to={`/components?category=${cat.value}`}
+                  className="group/item flex flex-col items-center text-center p-4 border-2 border-transparent hover:border-black transition-all bg-gray-50 hover:bg-white"
+                >
+                  <div className="mb-4 text-gray-300 group-hover/item:text-blue-600 transition-colors">
+                    <Icon size={32} strokeWidth={1.5} />
+                  </div>
+                  <span className="text-[10px] font-black text-black uppercase tracking-widest leading-tight italic">
+                    {cat.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -165,7 +205,7 @@ export default function Navbar() {
                 )}
                 
                 {hasDropdown && isMobileSubMenuOpen && (
-                  <div className="grid grid-cols-2 gap-2 p-2 bg-gray-50 border-x border-b border-black animate-in fade-in zoom-in-95 duration-200">
+                  <div className="grid grid-cols-2 gap-2 p-2 bg-gray-50 border-2 border-gray-200 animate-in fade-in zoom-in-95 duration-200 mt-1">
                     {CATEGORIES.map((cat) => (
                       <Link
                         key={cat.value}
@@ -185,13 +225,22 @@ export default function Navbar() {
             );
           })}
           <div className="pt-6 border-t-2 border-black flex flex-col gap-3">
-             <Link 
+             {user ? (
+               <button 
+                onClick={() => { localStorage.removeItem('pcforge_user'); localStorage.removeItem('admin_access'); window.location.reload(); }}
+                className="flex items-center gap-2 justify-center w-full py-4 border-2 border-black font-black text-red-600 hover:bg-red-50 uppercase text-[10px] tracking-widest transition-all italic"
+               >
+                Sign Out <LogOut size={18} />
+               </button>
+             ) : (
+               <Link 
                 to="/login"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-2 justify-center w-full py-4 border-2 border-black font-black hover:bg-gray-50 uppercase text-[10px] tracking-widest transition-all italic"
-             >
+               >
                 Sign In
-             </Link>
+               </Link>
+             )}
              <Link 
                 to="/builder"
                 onClick={() => setIsMobileMenuOpen(false)}

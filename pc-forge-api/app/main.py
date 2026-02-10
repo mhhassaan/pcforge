@@ -19,8 +19,10 @@ from app.services.cpu_service import format_cpus
 from app.repositories.case_repo import get_compatible_cases
 from app.services.case_service import format_cases
 from app.repositories.component_repo import get_components_by_category, get_filter_options
-from app.schemas import BuildRequest, BuildValidationResponse, PriceRequest, GalleryBuildCreate
-from app.services.gallery_service import create_gallery_entry, fetch_gallery_builds, fetch_build_details
+from app.schemas import BuildRequest, BuildValidationResponse, PriceRequest, GalleryBuildCreate, UserCreate, UserLogin
+from app.services.gallery_service import create_gallery_entry, fetch_gallery_builds, fetch_build_details, fetch_user_builds
+from app.repositories.metrics_repo import get_system_metrics
+from app.services.auth_service import register_user, authenticate_user
 
 import os
 
@@ -37,9 +39,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.post("/api/auth/register")
+def register(user: UserCreate):
+    new_user = register_user(user.dict())
+    if not new_user:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return {"message": "User registered successfully", "user": new_user}
+
+@app.post("/api/auth/login")
+def login(user: UserLogin):
+    authenticated_user = authenticate_user(user.email, user.password)
+    if not authenticated_user:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return {
+        "message": "Login successful", 
+        "user": {
+            "id": authenticated_user['id'],
+            "username": authenticated_user['username'], 
+            "email": authenticated_user['email']
+        }
+    }
+
 @app.get("/api/gallery")
 def get_gallery():
     return fetch_gallery_builds()
+
+@app.get("/api/gallery/user/{user_id}")
+def get_user_builds_endpoint(user_id: int):
+    return fetch_user_builds(user_id)
 
 @app.get("/api/gallery/{build_id}")
 def get_gallery_build(build_id: int):
@@ -195,6 +224,17 @@ def compatible_storage(motherboard_id: str = None):
     }
 
 @app.post("/api/build/price")
+
 def build_price(req: PriceRequest):
+
     rows = get_cheapest_prices(req.product_ids)
+
     return format_price_summary(rows, req.product_ids)
+
+
+
+@app.get("/api/admin/metrics")
+
+def admin_metrics():
+
+    return get_system_metrics()

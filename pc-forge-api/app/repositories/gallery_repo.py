@@ -8,8 +8,8 @@ def save_build(build_data: dict):
     sql = """
     INSERT INTO gallery_builds (
         title, description, cpu_id, motherboard_id, ram_id, 
-        gpu_id, psu_id, case_id, storage_id, user_name, total_price_pkr
-    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        gpu_id, psu_id, case_id, storage_id, user_name, user_id, total_price_pkr
+    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     RETURNING id;
     """
     
@@ -24,6 +24,7 @@ def save_build(build_data: dict):
         build_data.get('case_id'),
         build_data.get('storage_id'),
         build_data.get('user_name'),
+        build_data.get('user_id'),
         build_data.get('total_price_pkr')
     ))
     
@@ -32,6 +33,30 @@ def save_build(build_data: dict):
     cur.close()
     conn.close()
     return new_id
+
+def get_builds_by_user_id(user_id: int):
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    
+    sql = """
+    SELECT 
+        g.*,
+        p_cpu.product_name as cpu_name,
+        p_gpu.product_name as gpu_name,
+        p_case.product_name as case_name
+    FROM gallery_builds g
+    LEFT JOIN products p_cpu ON g.cpu_id = p_cpu.product_id
+    LEFT JOIN products p_gpu ON g.gpu_id = p_gpu.product_id
+    LEFT JOIN products p_case ON g.case_id = p_case.product_id
+    WHERE g.user_id = %s
+    ORDER BY g.created_at DESC;
+    """
+    
+    cur.execute(sql, (user_id,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [dict(row) for row in rows]
 
 def get_all_builds():
     conn = get_connection()

@@ -1,4 +1,4 @@
-from app.repositories.gallery_repo import save_build, get_all_builds, get_build_by_id
+from app.repositories.gallery_repo import save_build, get_all_builds, get_build_by_id, get_builds_by_user_id
 
 def create_gallery_entry(data: dict):
     # Any business logic/validation before saving
@@ -7,6 +7,13 @@ def create_gallery_entry(data: dict):
 def fetch_gallery_builds():
     builds = get_all_builds()
     # Format or filter if needed
+    for b in builds:
+        if b['total_price_pkr']:
+            b['total_price_pkr'] = float(b['total_price_pkr'])
+    return builds
+
+def fetch_user_builds(user_id: int):
+    builds = get_builds_by_user_id(user_id)
     for b in builds:
         if b['total_price_pkr']:
             b['total_price_pkr'] = float(b['total_price_pkr'])

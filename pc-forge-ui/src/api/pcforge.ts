@@ -7,6 +7,11 @@ export async function fetchGallery(): Promise<GalleryBuild[]> {
   return res.json();
 }
 
+export async function fetchUserBuilds(userId: number): Promise<GalleryBuild[]> {
+  const res = await fetch(`${API}/api/gallery/user/${userId}`);
+  return res.json();
+}
+
 export async function fetchGalleryBuild(id: number): Promise<GalleryBuild> {
   const res = await fetch(`${API}/api/gallery/${id}`);
   return res.json();
@@ -109,5 +114,11 @@ export async function fetchPrice(productIds: string[]): Promise<PriceResponse> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ product_ids: productIds }),
   });
+  return res.json();
+}
+
+export async function fetchAdminMetrics(): Promise<any> {
+  // Fetch system metrics for admin dashboard
+  const res = await fetch(`${API}/api/admin/metrics`);
   return res.json();
 }

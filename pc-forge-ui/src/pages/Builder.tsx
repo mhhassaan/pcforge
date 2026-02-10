@@ -12,7 +12,6 @@ export default function Builder() {
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
-    user_name: "",
     description: ""
   });
 
@@ -26,6 +25,9 @@ export default function Builder() {
   const psu = build.psu;
 
   const isComplete = !!(cpu && motherboard && ram && storage && chassis && gpu && psu);
+
+  const userStr = localStorage.getItem('pcforge_user');
+  const user = userStr ? JSON.parse(userStr) : null;
 
   const handleReset = () => {
     if (confirm("Are you sure you want to reset your current build?")) {
@@ -42,11 +44,18 @@ export default function Builder() {
     e.preventDefault();
     if (!isComplete) return;
     
+    if (!user) {
+        alert("Authentication required. Please sign in to archive your build.");
+        navigate("/login");
+        return;
+    }
+    
     setIsSaving(true);
     try {
         await saveToGallery({
             title: formData.title || "Untitled Masterpiece",
-            user_name: formData.user_name || "Anonymous",
+            user_name: user.username || "Anonymous",
+            user_id: user.id,
             description: formData.description,
             cpu_id: (cpu?.id || cpu?.product_id) as string,
             motherboard_id: (motherboard?.id || motherboard?.product_id) as string,
@@ -57,11 +66,11 @@ export default function Builder() {
             storage_id: (storage?.id || storage?.product_id) as string,
             total_price_pkr: totalPrice
         });
-        alert("Build published successfully!");
-        navigate("/gallery");
+        alert("Build archived successfully in your personal collection!");
+        navigate("/my-builds");
     } catch (err) {
         console.error("Save failed:", err);
-        alert("Failed to save build. Please try again.");
+        alert("Failed to archive build. Please try again.");
     } finally {
         setIsSaving(false);
     }
@@ -256,7 +265,7 @@ export default function Builder() {
                                 
                                 <form onSubmit={handleSave} className="p-8 space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Build Title</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-gray-400 italic">Build Title</label>
                                         <input 
                                             required
                                             type="text"
@@ -268,18 +277,7 @@ export default function Builder() {
                                     </div>
                                     
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Builder Name</label>
-                                        <input 
-                                            type="text"
-                                            value={formData.user_name}
-                                            onChange={e => setFormData({...formData, user_name: e.target.value})}
-                                            placeholder="Your Username"
-                                            className="w-full border-2 border-black p-4 text-sm font-black uppercase tracking-tight focus:bg-gray-50 outline-none"
-                                        />
-                                    </div>
-            
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 italic">Project Notes</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-gray-400 italic">Project Notes</label>
                                         <textarea 
                                             rows={3}
                                             value={formData.description}
@@ -308,4 +306,3 @@ export default function Builder() {
                 </div>
               );
             }
-            

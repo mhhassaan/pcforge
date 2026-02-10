@@ -1,17 +1,69 @@
 import { useState } from 'react';
-import { ArrowRight, Lock, Mail, User, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Lock, Mail, User, ShieldCheck, Loader2 } from 'lucide-react';
+import Cubes from '@/components/ui/Cubes';
 
 export default function Auth() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     username: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Authentication system is in demonstration mode. Access granted.");
+    setLoading(true);
+    setError(null);
+
+    const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
+    const payload = isLogin 
+        ? { email: formData.email, password: formData.password }
+        : formData;
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        const res = await fetch(`${API}${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
+        console.log("Response status:", res.status);
+        const data = await res.json();
+        console.log("Response data:", data);
+
+        if (!res.ok) {
+            throw new Error(data.detail || "Authentication failed");
+        }
+
+        if (isLogin) {
+            localStorage.setItem("pcforge_user", JSON.stringify(data.user));
+            navigate("/");
+        } else {
+            alert("Registration successful! Please login.");
+            setIsLogin(true);
+        }
+    } catch (err: any) {
+        console.error("Auth Error:", err);
+        if (err.name === 'AbortError') {
+            setError("Request timed out. Check server connection.");
+        } else {
+            setError(err.message || "Network error or server unreachable");
+        }
+    } finally {
+        setLoading(false);
+    }
   };
 
   return (
@@ -19,6 +71,17 @@ export default function Auth() {
       {/* Background Effect */}
       <div className="absolute inset-0 z-0">
         <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+          <Cubes 
+            gridSize={12}
+            maxAngle={75}
+            radius={3}
+            borderStyle="1px solid #000"
+            faceColor="transparent"
+            rippleColor="#2563EB"
+            rippleSpeed={1.5}
+            autoAnimate
+            rippleOnClick
+          />
         </div>
       </div>
 
@@ -38,6 +101,12 @@ export default function Auth() {
               {isLogin ? 'Enter valid hardware architect credentials.' : 'Initialize new community build profile.'}
             </p>
           </header>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 border border-red-200 text-xs font-bold uppercase tracking-wide text-center">
+                {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {!isLogin && (
@@ -88,10 +157,12 @@ export default function Auth() {
             </div>
 
             <button 
+              disabled={loading}
               type="submit"
-              className="w-full bg-black text-white font-black py-5 uppercase tracking-[0.3em] text-[10px] transition-all hover:bg-blue-600 flex items-center justify-center gap-3 shadow-[8px_8px_0px_0px_rgba(37,99,235,1)] active:shadow-none active:translate-x-1 active:translate-y-1"
+              className="w-full bg-black text-white font-black py-5 uppercase tracking-[0.3em] text-[10px] transition-all hover:bg-blue-600 flex items-center justify-center gap-3 shadow-[8px_8px_0px_0px_rgba(37,99,235,1)] active:shadow-none active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLogin ? 'Grant Access' : 'Register Profile'} <ArrowRight size={16} />
+              {loading ? <Loader2 className="animate-spin" size={16} /> : (isLogin ? 'Grant Access' : 'Register Profile')} 
+              {!loading && <ArrowRight size={16} />}
             </button>
           </form>
 
@@ -100,7 +171,10 @@ export default function Auth() {
               {isLogin ? "No valid ID?" : "Already Registered?"}
             </p>
             <button 
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError(null);
+              }}
               className="text-[10px] font-black text-blue-600 hover:text-black uppercase tracking-[0.2em] border-b-2 border-blue-600 pb-0.5 transition-colors italic"
             >
               {isLogin ? 'REQUEST_NEW_ID' : 'RETURN_TO_LOGIN'}
