@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Cpu } from 'lucide-react';
+import { ArrowRight, Cpu, Activity, ShieldCheck, Zap, Maximize, Database, Layout } from 'lucide-react';
 import { MorphingText } from '../ui/MorphingText';
 import { DottedMap } from '../ui/DottedMap';
+import { Highlighter } from '../ui/Highlighter';
+import { Safari } from '../ui/Safari';
 
 export default function Hero() {
   return (
@@ -26,8 +28,7 @@ export default function Hero() {
       </div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8"> 
-      {/* <div className="w-full mx-auto px-4 md:px-8"> */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.7fr_1.3fr] gap-12 items-center">
           {/* Left Content */}
           <div className="space-y-8 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-black dark:bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em]">
@@ -42,7 +43,7 @@ export default function Hero() {
                   texts={[
                     "COMPATIBLE",
                     "POWERFUL",
-                    "OPTIMIZED",
+                    "Calibrated",
                     "RELIABLE",
                     "PRECISE",
                     "BALANCED"
@@ -53,7 +54,7 @@ export default function Hero() {
             </div>
             
             <p className="text-lg md:text-xl text-gray-600 dark:text-slate-400 leading-tight font-medium max-w-lg uppercase">
-              Compare prices from <i><b>Pakistani vendors</b></i> automatically. No guesswork. Just engineering.
+              Compare prices from <Highlighter color="#2563EB" action="underline" iterations={2} strokeWidth={2}>Pakistani vendors</Highlighter> automatically. No guesswork. Just engineering.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-0 pt-4">
@@ -72,113 +73,102 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Visual */}
+          {/* Right Visual: Component Specs in Safari Mockup */}
           <div className="relative flex justify-center lg:justify-end">
-            <div className="bg-white dark:bg-slate-900 border-2 border-black dark:border-white/10 p-3 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(37,99,235,0.2)] w-full max-w-lg"> 
-              <div className="aspect-[4/3] bg-gray-50 dark:bg-[#020817] border border-gray-200 dark:border-white/5 p-6 flex flex-col justify-between">
+            <div className="w-full max-w-3xl shadow-[32px_32px_0px_0px_rgba(37,99,235,1)] dark:shadow-[32px_32px_0px_0px_rgba(37,99,235,0.2)] border-2 border-black dark:border-white/10 transition-all">
+                <Safari url="pcforge.pk/build-manifest/0x4F2A" className="w-full">
+                    <div className="size-full bg-gray-50 dark:bg-[#0a0a0a] p-6 flex flex-col justify-between overflow-hidden">
 
-                {/* ================= PERFORMANCE METERS ================= */}
-                <div className="space-y-4">
+                        {/* ================= ASSEMBLY MANIFEST ================= */}
+                        <div className="space-y-4">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.3em] italic">Assembly_Manifest</span>
+                            <span className="text-[8px] font-mono text-gray-400">SYNC_ID: 0x4F2A</span>
+                        </div>
 
-                  {[
-                    { label: "CPU", value: 98 },
-                    { label: "GPU", value: 95 },
-                    { label: "RAM", value: 80 },
-                    { label: "COOLING", value: 88 },
-                  ].map((item) => (
-                    <div key={item.label}>
-                      <div className="flex justify-between text-[10px] font-black tracking-widest dark:text-slate-300">
-                        <span>{item.label}</span>
-                        <span className="text-blue-600 dark:text-blue-400">{item.value}%</span>
-                      </div>
+                        <div className="grid grid-cols-1 gap-2">
+                            {[
+                                { icon: <Cpu size={14} />, label: "PROCESSOR", name: "AMD Ryzen 7 7800X3D", spec: "8C/16T • 5.0GHz" },
+                                { icon: <Activity size={14} />, label: "GRAPHICS", name: "NVIDIA RTX 4080 Super", spec: "16GB GDDR6X" },
+                                { icon: <Zap size={14} />, label: "MEMORY", name: "G.Skill Trident Z5 Neo", spec: "32GB DDR5-6000" },
+                                { icon: <Layout size={14} />, label: "MOTHERBOARD", name: "MSI MAG B650 Tomahawk", spec: "AM5 • WiFi 6E" }
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-center gap-4 bg-white dark:bg-[#121212] border border-black/5 dark:border-white/5 p-3 group hover:border-blue-600/50 transition-colors">
+                                    <div className="text-blue-600 dark:text-blue-400 opacity-50 group-hover:opacity-100 transition-opacity">
+                                        {item.icon}
+                                    </div>
+                                    <div className="flex-1 flex justify-between items-center">
+                                        <div>
+                                            <div className="text-[7px] font-black text-gray-400 uppercase tracking-widest">{item.label}</div>
+                                            <div className="text-[10px] font-black dark:text-white uppercase truncate">{item.name}</div>
+                                        </div>
+                                        <div className="text-[9px] font-black text-blue-600 dark:text-blue-400 font-mono italic">
+                                            {item.spec}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        </div>
 
-                      <div className="h-2 bg-black/10 dark:bg-white/5">
-                        <div
-                          className="h-full bg-blue-600 dark:bg-blue-400"
-                          style={{ width: `${item.value}%` }}
-                        />
-                      </div>
+                        {/* ================= COMPATIBILITY GRID ================= */}
+                        <div className="grid grid-cols-3 gap-4 pt-6 items-stretch">
+
+                        {/* LEFT — CPU SOCKET */}
+                        <div className="border-2 border-black dark:border-white/10 p-3 flex flex-col justify-between bg-white dark:bg-[#121212]/50">
+                            <div className="space-y-1">
+                                <div className="text-[8px] font-black uppercase text-gray-400 italic">Socket Type</div>
+                                <div className="text-[10px] font-black dark:text-white leading-tight uppercase italic">AM5 <br />Ryzen 7000</div>
+                            </div>
+                            <div className="pt-2 flex items-center justify-between">
+                                <ShieldCheck size={12} className="text-green-500" />
+                                <span className="text-[8px] font-black text-blue-600 dark:text-blue-400 uppercase">Verified</span>
+                            </div>
+                        </div>
+
+                        {/* CENTER — GPU CLEARANCE */}
+                        <div className="border-2 border-black dark:border-white/10 p-3 flex flex-col justify-between bg-white dark:bg-[#121212]/50">
+                            <div className="space-y-1">
+                                <div className="text-[8px] font-black uppercase text-gray-400 italic">GPU Length</div>
+                                <div className="text-[10px] font-black dark:text-white leading-tight uppercase italic">L - 310mm <br /> H - 140mm <br /> W - 61mm</div>
+                            </div>
+                            <div className="pt-2 flex items-center justify-between">
+                                <Maximize size={12} className="text-blue-600" />
+                                <span className="text-[8px] font-black text-green-500">PASS</span>
+                            </div>
+                        </div>
+
+                        {/* RIGHT — BUILD VALIDATION */}
+                        <div className="flex flex-col gap-2">
+                            <div className="flex-1 border-2 border-black dark:border-blue-600 p-2 flex flex-col items-center justify-center text-center bg-black dark:bg-blue-600 text-white">
+                                <Activity size={14} className="mb-1 animate-pulse" />
+                                <div className="text-[8px] font-black uppercase italic">VALIDATED</div>
+                            </div>
+                            <div className="border-2 border-black dark:border-white/10 p-2 bg-white dark:bg-[#121212]/50">
+                                <div className="text-[7px] font-black uppercase text-gray-400 italic">Total Cost</div>
+                                <div className="text-[15px] font-black text-blue-600 dark:text-blue-400 font-mono tracking-tighter">Rs. 485,250</div>
+                            </div>
+                        </div>
+
+                        </div>
+
+                        {/* ================= SYSTEM STATUS ================= */}
+                        <div className="pt-4 flex justify-between items-end border-t border-black/5 dark:border-white/5">
+                            <div className="flex gap-1">
+                                {[...Array(4)].map((_, i) => (
+                                    <div key={i} className="w-2 h-2 bg-blue-600/20 dark:bg-blue-900/40 rounded-full flex items-center justify-center">
+                                        <div className="w-1 h-1 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: `${i * 200}ms` }}></div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="text-right">
+                                <div className="text-[8px] font-black tracking-widest text-gray-400 dark:text-slate-600 uppercase">PCFORGE // ENGINE_v4</div>
+                                <div className="text-[7px] font-mono text-gray-300 dark:text-slate-800 uppercase italic">All parameters synchronized</div>
+                            </div>
+                        </div>
+
                     </div>
-                  ))}
-
-                </div>
-
-                {/* ================= ABSTRACT BUILD GRID ================= */}
-                <div className="grid grid-cols-3 gap-6 pt-6 items-end">
-
-                  {/* LEFT — SYSTEM CORE */}
-                  <div className="border-2 border-black dark:border-white/10 p-4 space-y-3">
-
-                    <div className="h-3 bg-black dark:bg-slate-700 w-2/3"></div>
-                    <div className="h-3 bg-black dark:bg-slate-700 w-1/2"></div>
-                    <div className="h-3 bg-blue-600 dark:bg-blue-400 w-3/4"></div>
-
-                    <div className="pt-4 space-y-2">
-                      <div className="h-2 bg-black/20 dark:bg-white/5"></div>
-                      <div className="h-2 bg-black/20 dark:bg-white/5"></div>
-                    </div>
-
-                  </div>
-
-                  {/* CENTER — STORAGE STACK */}
-                  <div className="flex flex-col gap-3 items-center">
-
-                    <div className="w-24 h-10 border-2 border-black dark:border-white/10 flex items-center justify-center text-[9px] font-black dark:text-slate-300">
-                      SSD • 1TB
-                    </div>
-
-                    <div className="w-24 h-10 border-2 border-black dark:border-white/10 flex items-center justify-center text-[9px] font-black dark:text-slate-300">
-                      HDD • 4TB
-                    </div>
-
-                    {/* Signal Lines */}
-                    <div className="space-y-1 pt-1">
-                      <div className="h-[2px] w-20 bg-black/30 dark:bg-white/10"></div>
-                      <div className="h-[2px] w-14 bg-black/30 dark:bg-white/10"></div>
-                    </div>
-
-                  </div>
-
-                  {/* RIGHT — BUILD STATUS */}
-                  <div className="flex flex-col items-center gap-4">
-
-                    {/* Compatibility */}
-                    <div className="w-20 h-20 border-2 border-black dark:border-white/10 rounded-full flex flex-col items-center justify-center font-black text-[9px] dark:text-slate-300">
-                      <span className="text-blue-600 dark:text-blue-400 text-lg">✓</span>
-                      OK
-                    </div>
-
-                    {/* Price */}
-                    <div className="border-2 border-black dark:border-white/10 px-4 py-2 text-center">
-                      <div className="text-[8px] font-black tracking-widest text-gray-400 dark:text-slate-500">
-                        TOTAL
-                      </div>
-                      <div className="text-lg font-black text-blue-600 dark:text-blue-400">
-                        Rs. 485K
-                      </div>
-                    </div>
-
-                  </div>
-
-                </div>
-
-                {/* ================= FOOTER ================= */}
-                <div className="pt-4 flex justify-between items-center">
-
-                  {/* IO Blocks */}
-                  <div className="flex gap-2">
-                    <div className="w-5 h-3 bg-black dark:bg-slate-700"></div>
-                    <div className="w-5 h-3 bg-black dark:bg-slate-700"></div>
-                    <div className="w-5 h-3 bg-black dark:bg-slate-700"></div>
-                  </div>
-
-                  <div className="text-[9px] font-black tracking-widest text-gray-400 dark:text-slate-600">
-                    PCFORGE • BUILD MATRIX
-                  </div>
-
-                </div>
-
-              </div>
+                </Safari>
             </div>
           </div>
         </div>

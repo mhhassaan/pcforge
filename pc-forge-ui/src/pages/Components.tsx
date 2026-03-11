@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { 
     fetchComponents, 
@@ -18,6 +18,7 @@ import ComponentDetails from '../components/ComponentDetails';
 import { ChevronDown, ChevronUp, Filter, Hammer, Check, X } from 'lucide-react';
 import { useBuild } from '../context/BuildContext';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { ScrollProgress } from '../components/ui/ScrollProgress';
 
 const CATEGORIES = [
   { label: 'CPU', value: 'cpu' },
@@ -30,6 +31,7 @@ const CATEGORIES = [
 ];
 
 export default function Components() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addComponent } = useBuild();
@@ -284,6 +286,7 @@ export default function Components() {
 
   return (
     <div className="h-[calc(100vh-64px)] bg-white dark:bg-[#0a0a0a] text-black dark:text-white flex overflow-hidden font-sans relative transition-colors duration-300">
+      <ScrollProgress container={scrollContainerRef} className="bg-blue-600" />
       
       {/* 1. Left Sidebar: Filters (Desktop) */}
       <aside className="hidden lg:flex w-64 flex-shrink-0 border-r border-black dark:border-white/10 flex-col bg-gray-50 dark:bg-slate-900/30">
@@ -348,7 +351,7 @@ export default function Components() {
               </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin dark:scrollbar-thumb-blue-600 dark:scrollbar-track-slate-900">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin dark:scrollbar-thumb-blue-600 dark:scrollbar-track-slate-900">
               {error && (
                 <div className="bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 p-4 border border-red-200 dark:border-red-900/20 uppercase font-black text-[10px] tracking-wide text-center">
                     {error}
