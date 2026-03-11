@@ -1,8 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Hammer, Monitor, Cpu, Image as ImageIcon, Menu, X, 
-  BookOpen, ChevronDown, Layout, Zap, HardDrive, 
-  Box, ShieldCheck, LogOut, Folder, Moon, Sun, MemoryStick
+  Monitor, Cpu, Menu, X, 
+  ChevronDown, Layout, Zap, HardDrive, MemoryStick, 
+  Box, LogOut, Moon, Sun
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../context/ThemeContext';

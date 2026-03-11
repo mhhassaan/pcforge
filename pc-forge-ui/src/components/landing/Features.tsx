@@ -5,9 +5,7 @@ import {
   Zap, 
   Scale, 
   DollarSign, 
-  ChevronRight, 
   Cpu, 
-  Layout, 
   Maximize, 
   Activity, 
   ShieldCheck,
@@ -62,12 +60,12 @@ export default function Features() {
                 animation="fadeIn" 
                 by="line" 
                 as="h2" 
-                className="text-3xl md:text-5xl font-black text-black dark:text-white uppercase tracking-tighter mb-6 leading-[0.9]"
+                className="text-3xl md:text-5xl font-black text-black dark:text-white uppercase tracking-tighter mb-6 leading-[0.9] italic"
               >
                 TECHNICAL{"\n"}SPECIFICATIONS
               </TextAnimate>
-              <p className="text-base md:text-lg text-gray-600 dark:text-slate-400 max-w-lg leading-snug font-medium uppercase">
-                Our builder is designed to prevent compatibility errors before you spending your money.
+              <p className="text-base md:text-lg text-gray-600 dark:text-slate-400 max-w-lg leading-snug font-medium uppercase italic">
+                Our suite of tools is designed to prevent <Highlighter action="highlight" color="#2563EB" iterations={2}>assembly errors</Highlighter> before you spend a single Rupee.
               </p>
             </div>
 

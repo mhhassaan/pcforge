@@ -1,6 +1,6 @@
 import { NumberTicker } from "../ui/NumberTicker";
 import { Highlighter } from "../ui/Highlighter";
-import { Cpu, Monitor, Layout, Zap, HardDrive, Box, MemoryStick } from "lucide-react";
+import { Cpu, Monitor, Layout, Zap, Box, MemoryStick } from "lucide-react";
 
 const STATS = [
   { label: "PROCESSORS", value: 66, icon: <Cpu size={20} /> },
