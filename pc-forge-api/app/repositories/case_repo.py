@@ -2,7 +2,7 @@ from app.db import get_connection
 
 import psycopg2.extras
 
-def get_compatible_cases(motherboard_id: str = None, gpu_id: str = None):
+def get_compatible_cases(motherboard_id: str = None, gpu_id: str = None, sort_by: str = None, order: str = "asc"):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -46,6 +46,15 @@ def get_compatible_cases(motherboard_id: str = None, gpu_id: str = None):
             AND g.length_mm <= c.max_gpu_length_mm
         )"""
         params.append(gpu_id)
+
+    # Sorting logic
+    valid_sort_cols = {
+        "product_name": "p.product_name",
+        "price_pkr": "price_pkr"
+    }
+    sort_col = valid_sort_cols.get(sort_by, "p.product_name")
+    sort_order = "ASC" if order.lower() == "asc" else "DESC"
+    sql += f" ORDER BY {sort_col} {sort_order}"
 
     cur.execute(sql, tuple(params))
     rows = cur.fetchall()

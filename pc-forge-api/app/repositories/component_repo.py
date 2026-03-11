@@ -12,12 +12,12 @@ def get_filter_options(category: str):
     conn = get_connection()
     cur = conn.cursor()
 
-    # Define filterable columns per category
+    # Define filterable columns per category based on db-schema.sql
     filter_map = {
         "cpu": ["socket", "cores", "manufacturer"],
         "gpu": ["chipset", "vram_gb", "chipset_manufacturer"],
         "motherboard": ["socket", "chipset", "form_factor", "ram_type"],
-        "psu": ["efficiency_rating", "modular"],
+        "psu": ["efficiency_rating", "modular", "wattage"],
         "ram": ["ram_type", "total_capacity_gb", "speed_mhz"],
         "storage": ["storage_type", "capacity_gb", "interface", "nvme"],
         "case": ["case_form_factor", "side_panel_type"]
@@ -45,11 +45,11 @@ def get_filter_options(category: str):
         # Some columns come from 'products' table, others from 'specs'
         table = "products" if col in ["manufacturer", "category"] else specs_table
         
-        # Mapping frontend category to DB category list
+        # Mapping frontend category to DB category list (based on product_category enum)
         category_db_map = {
             "cpu": ["cpu"],
             "gpu": ["gpu"],
-            "motherboard": ["motherboards"],
+            "motherboard": ["motherboard"],
             "psu": ["psu"],
             "ram": ["ram"],
             "storage": ["ssd"],
@@ -74,6 +74,30 @@ def get_filter_options(category: str):
     _filter_cache[category] = options
     return options
 
+def get_category_counts():
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    category_db_map = {
+        "cpu": ["cpu"],
+        "gpu": ["gpu"],
+        "motherboard": ["motherboard"],
+        "psu": ["psu"],
+        "ram": ["ram"],
+        "storage": ["ssd"],
+        "case": ["case"]
+    }
+    
+    counts = {}
+    for cat, db_cats in category_db_map.items():
+        placeholders = ', '.join(['%s'] * len(db_cats))
+        cur.execute(f"SELECT COUNT(*) FROM products WHERE category IN ({placeholders})", db_cats)
+        counts[cat] = cur.fetchone()[0]
+        
+    cur.close()
+    conn.close()
+    return counts
+
 def get_all_filters():
     categories = ["cpu", "gpu", "motherboard", "psu", "ram", "storage", "case"]
     result = {}
@@ -81,7 +105,7 @@ def get_all_filters():
         result[cat] = get_filter_options(cat)
     return result
 
-def get_components_by_category(category: str, search_query: str = None, filters: dict = None):
+def get_components_by_category(category: str, search_query: str = None, filters: dict = None, sort_by: str = None, order: str = "asc"):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -98,7 +122,7 @@ def get_components_by_category(category: str, search_query: str = None, filters:
     category_db_map = {
         "cpu": ["cpu"],
         "gpu": ["gpu"],
-        "motherboard": ["motherboards"],
+        "motherboard": ["motherboard"],
         "psu": ["psu"],
         "ram": ["ram"],
         "storage": ["ssd"],
@@ -128,7 +152,7 @@ def get_components_by_category(category: str, search_query: str = None, filters:
         ) FILTER (WHERE v.price IS NOT NULL) as all_prices,
         s.*
     FROM products p
-    JOIN {specs_table} s ON p.product_id = s.product_id
+    LEFT JOIN {specs_table} s ON p.product_id = s.product_id
     LEFT JOIN vendor_prices v ON p.product_id = v.product_id
     WHERE p.category IN ({','.join(['%s'] * len(db_categories))})
     """
@@ -148,6 +172,18 @@ def get_components_by_category(category: str, search_query: str = None, filters:
             params.extend(values)
 
     sql += " GROUP BY p.product_id, s.product_id, p.image_url"
+
+    # Sorting logic
+    valid_sort_cols = {
+        "product_name": "p.product_name",
+        "price_pkr": "price_pkr",
+        "manufacturer": "p.manufacturer"
+    }
+    
+    sort_col = valid_sort_cols.get(sort_by, "p.product_name")
+    sort_order = "ASC" if order.lower() == "asc" else "DESC"
+    
+    sql += f" ORDER BY {sort_col} {sort_order}"
 
     cur.execute(sql, params)
     rows = cur.fetchall()

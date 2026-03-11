@@ -108,9 +108,9 @@ export default function AssemblyFlow() {
 
   return (
     <>
-      <div className="relative py-12 overflow-hidden">
+      <div className="relative py-12 overflow-hidden transition-colors duration-300">
         {/* Central Line */}
-        <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gray-200 -translate-x-1/2 md:translate-x-0 ml-4 md:ml-0" />
+        <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-white/10 -translate-x-1/2 md:translate-x-0 ml-4 md:ml-0" />
 
         <div className="space-y-12 md:space-y-20">
           {STEPS.map((step, i) => (
@@ -125,36 +125,36 @@ export default function AssemblyFlow() {
               }`}
             >
               {/* Timeline Node */}
-              <div className="absolute left-4 md:left-1/2 w-10 h-10 bg-white border-2 border-black rounded-none z-10 -translate-x-1/2 ml-4 md:ml-0 flex items-center justify-center font-black text-[10px]">
+              <div className="absolute left-4 md:left-1/2 w-10 h-10 bg-white dark:bg-[#0a0a0a] border-2 border-black dark:border-blue-600 rounded-none z-10 -translate-x-1/2 ml-4 md:ml-0 flex items-center justify-center font-black text-[10px] dark:text-white transition-colors">
                   {i + 1}
               </div>
 
               {/* Content Side */}
               <div className="w-full md:w-1/2 pl-16 md:pl-0">
-                  <div className={`bg-white p-8 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(37,99,235,1)] transition-all ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                      <div className={`flex items-center gap-2 mb-2 font-black text-blue-600 uppercase tracking-widest text-[9px] ${i % 2 === 0 ? 'md:justify-end' : 'md:justify-start'}`}>
+                  <div className={`bg-white dark:bg-[#121212] p-8 border-2 border-black dark:border-white/10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.2)] hover:shadow-[4px_4px_0px_0px_rgba(37,99,235,1)] dark:hover:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.4)] transition-all ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
+                      <div className={`flex items-center gap-2 mb-2 font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest text-[9px] ${i % 2 === 0 ? 'md:justify-end' : 'md:justify-start'}`}>
                           <span>SEQUENCE_0{i + 1}</span>
                       </div>
-                      <h3 className="text-xl font-black text-black uppercase tracking-tight mb-3">{step.title}</h3>
-                      <p className="text-gray-500 text-xs leading-relaxed font-medium uppercase tracking-tight">{step.desc}</p>
+                      <h3 className="text-xl font-black text-black dark:text-white uppercase tracking-tight mb-3 italic">{step.title}</h3>
+                      <p className="text-gray-500 dark:text-slate-400 text-xs leading-relaxed font-medium uppercase tracking-tight">{step.desc}</p>
                   </div>
               </div>
 
               {/* Image Side */}
               <div className="w-full md:w-1/2 pl-16 md:pl-0">
                   <div 
-                    className="rounded-none overflow-hidden border-2 border-black p-1 bg-white cursor-pointer relative group"
+                    className="rounded-none overflow-hidden border-2 border-black dark:border-white/10 p-1 bg-white dark:bg-[#121212] cursor-pointer relative group"
                     onClick={() => openLightbox(i)}
                   >
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-blue-600/10 transition-colors z-10 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                          <span className="bg-black text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest">
+                          <span className="bg-black dark:bg-blue-600 text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest">
                               Expand Visual
                           </span>
                       </div>
                       <img 
                           src={step.imgs[0]} 
                           alt={step.title} 
-                          className="w-full h-40 object-cover grayscale group-hover:grayscale-0 transition-all duration-500" 
+                          className="w-full h-40 object-cover grayscale group-hover:grayscale-0 transition-all duration-500 opacity-80 group-hover:opacity-100" 
                       />
                       {step.imgs.length > 1 && (
                           <div className="absolute bottom-2 right-2 bg-blue-600 px-2 py-1 text-[8px] font-black text-white uppercase tracking-widest">
@@ -175,7 +175,7 @@ export default function AssemblyFlow() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[300] flex items-center justify-center bg-white/95 backdrop-blur-sm p-4"
+                className="fixed inset-0 z-[300] flex items-center justify-center bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-sm p-4 transition-colors duration-300"
                 onClick={closeLightbox}
             >
                 <div className="relative w-full max-w-5xl h-full flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
@@ -183,20 +183,20 @@ export default function AssemblyFlow() {
                     {/* Close Button */}
                     <button 
                         onClick={closeLightbox}
-                        className="absolute top-0 right-0 p-2 text-black hover:text-blue-600 transition-colors z-50"
+                        className="absolute top-0 right-0 p-2 text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors z-50"
                     >
                         <X size={32} />
                     </button>
 
                     {/* Main Image */}
-                    <div className="bg-white border-2 border-black p-2 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+                    <div className="bg-white dark:bg-[#121212] border-2 border-black dark:border-blue-600 p-2 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(37,99,235,0.2)]">
                         <motion.img 
                             key={currentImageIndex}
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             src={STEPS[selectedStep].imgs[currentImageIndex]}
                             alt={`Step ${selectedStep + 1} Image`}
-                            className="max-h-[70vh] w-auto object-contain"
+                            className="max-h-[70vh] w-auto object-contain dark:brightness-90"
                         />
                     </div>
 
@@ -205,13 +205,13 @@ export default function AssemblyFlow() {
                         <>
                             <button 
                                 onClick={prevImage}
-                                className="absolute left-0 top-1/2 -translate-y-1/2 p-4 bg-black text-white hover:bg-blue-600 transition-colors"
+                                className="absolute left-0 top-1/2 -translate-y-1/2 p-4 bg-black dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors"
                             >
                                 <ChevronLeft size={32} />
                             </button>
                             <button 
                                 onClick={nextImage}
-                                className="absolute right-0 top-1/2 -translate-y-1/2 p-4 bg-black text-white hover:bg-blue-600 transition-colors"
+                                className="absolute right-0 top-1/2 -translate-y-1/2 p-4 bg-black dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors"
                             >
                                 <ChevronRight size={32} />
                             </button>
@@ -220,8 +220,8 @@ export default function AssemblyFlow() {
 
                     {/* Caption */}
                     <div className="absolute bottom-10 text-center space-y-2">
-                        <h3 className="text-2xl font-black text-black uppercase tracking-tighter italic">{STEPS[selectedStep].title}</h3>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <h3 className="text-2xl font-black text-black dark:text-white uppercase tracking-tighter italic">{STEPS[selectedStep].title}</h3>
+                        <p className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">
                             STEP {selectedStep + 1} OF {STEPS.length} // IMG {currentImageIndex + 1}
                         </p>
                     </div>

@@ -1,7 +1,7 @@
 from app.db import get_connection
 import psycopg2.extras
 
-def get_compatible_storage(motherboard_id: str):
+def get_compatible_storage(motherboard_id: str, sort_by: str = None, order: str = "asc"):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -22,10 +22,19 @@ def get_compatible_storage(motherboard_id: str):
         ORDER BY product_id, price ASC
     ) v ON s.product_id = v.product_id
     WHERE
-      (s.nvme = true AND m.m2_slots > 0)
+      ((s.nvme = true AND m.m2_slots > 0)
       OR
-      (s.nvme = false AND m.sata_6gb_ports > 0);
+      (s.nvme = false AND m.sata_6gb_ports > 0))
     """
+
+    # Sorting logic
+    valid_sort_cols = {
+        "product_name": "p.product_name",
+        "price_pkr": "price_pkr"
+    }
+    sort_col = valid_sort_cols.get(sort_by, "p.product_name")
+    sort_order = "ASC" if order.lower() == "asc" else "DESC"
+    sql += f" ORDER BY {sort_col} {sort_order}"
 
     cur.execute(sql, (motherboard_id,))
     rows = cur.fetchall()

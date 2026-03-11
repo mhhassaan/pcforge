@@ -59,51 +59,68 @@ export async function fetchAllFilters(): Promise<Record<string, Record<string, s
   return res.json();
 }
 
+export async function fetchCategoryCounts(): Promise<Record<string, number>> {
+  const res = await fetch(`${API}/api/components/counts`);
+  return res.json();
+}
+
 export async function fetchCPUs(): Promise<{ cpus: CPU[] }> {
   const res = await fetch(`${API}/api/cpus`);
   return res.json();
 }
 
-export async function fetchMotherboards(cpuId?: string | null): Promise<{ motherboards: Motherboard[] }> {
+export async function fetchMotherboards(cpuId?: string | null, sortBy?: string, order?: string): Promise<{ motherboards: Motherboard[] }> {
   const url = new URL(`${API}/api/compatible/motherboards`);
   if (cpuId) url.searchParams.append("cpu_id", cpuId);
+  if (sortBy) url.searchParams.append("sort_by", sortBy);
+  if (order) url.searchParams.append("order", order);
   const res = await fetch(url.toString());
   return res.json();
 }
 
-export async function fetchRAM(motherboardId?: string | null): Promise<{ ram: RAM[] }> {
+export async function fetchRAM(motherboardId?: string | null, sortBy?: string, order?: string): Promise<{ ram: RAM[] }> {
   const url = new URL(`${API}/api/compatible/ram`);
   if (motherboardId) url.searchParams.append("motherboard_id", motherboardId);
+  if (sortBy) url.searchParams.append("sort_by", sortBy);
+  if (order) url.searchParams.append("order", order);
   const res = await fetch(url.toString());
   return res.json();
 }
 
-export async function fetchStorage(motherboardId?: string | null): Promise<{ storage: Storage[] }> {
+export async function fetchStorage(motherboardId?: string | null, sortBy?: string, order?: string): Promise<{ storage: Storage[] }> {
   const url = new URL(`${API}/api/compatible/storage`);
   if (motherboardId) url.searchParams.append("motherboard_id", motherboardId);
+  if (sortBy) url.searchParams.append("sort_by", sortBy);
+  if (order) url.searchParams.append("order", order);
   const res = await fetch(url.toString());
   return res.json();
 }
 
-export async function fetchCases(motherboardId?: string | null, gpuId?: string | null): Promise<{ cases: Case[] }> {
+export async function fetchCases(motherboardId?: string | null, gpuId?: string | null, sortBy?: string, order?: string): Promise<{ cases: Case[] }> {
   const url = new URL(`${API}/api/compatible/cases`);
   if (motherboardId) url.searchParams.append("motherboard_id", motherboardId);
   if (gpuId) url.searchParams.append("gpu_id", gpuId);
+  if (sortBy) url.searchParams.append("sort_by", sortBy);
+  if (order) url.searchParams.append("order", order);
   const res = await fetch(url.toString());
   return res.json();
 }
 
-export async function fetchGPUs(caseId?: string | null): Promise<{ gpus: GPU[] }> {
+export async function fetchGPUs(caseId?: string | null, sortBy?: string, order?: string): Promise<{ gpus: GPU[] }> {
   const url = new URL(`${API}/api/compatible/gpus`);
   if (caseId) url.searchParams.append("case_id", caseId);
+  if (sortBy) url.searchParams.append("sort_by", sortBy);
+  if (order) url.searchParams.append("order", order);
   const res = await fetch(url.toString());
   return res.json();
 }
 
-export async function fetchPSUs(cpuId?: string | null, gpuId?: string | null): Promise<{ psus: PSU[] }> {
+export async function fetchPSUs(cpuId?: string | null, gpuId?: string | null, sortBy?: string, order?: string): Promise<{ psus: PSU[] }> {
   const url = new URL(`${API}/api/compatible/psus`);
   if (cpuId) url.searchParams.append("cpu_id", cpuId);
   if (gpuId) url.searchParams.append("gpu_id", gpuId);
+  if (sortBy) url.searchParams.append("sort_by", sortBy);
+  if (order) url.searchParams.append("order", order);
   const res = await fetch(url.toString());
   return res.json();
 }
@@ -120,5 +137,26 @@ export async function fetchPrice(productIds: string[]): Promise<PriceResponse> {
 export async function fetchAdminMetrics(): Promise<any> {
   // Fetch system metrics for admin dashboard
   const res = await fetch(`${API}/api/admin/metrics`);
+  return res.json();
+}
+
+export async function fetchIncompleteProducts(category?: string): Promise<any[]> {
+  const url = new URL(`${API}/api/admin/incomplete-products`);
+  if (category) url.searchParams.append("category", category);
+  const res = await fetch(url.toString());
+  return res.json();
+}
+
+export async function fetchCategorySchema(category: string): Promise<any[]> {
+  const res = await fetch(`${API}/api/admin/category-schema?category=${category}`);
+  return res.json();
+}
+
+export async function updateProductSpecs(payload: { product_id: string; category: string; specs: any }): Promise<any> {
+  const res = await fetch(`${API}/api/admin/update-specs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
   return res.json();
 }

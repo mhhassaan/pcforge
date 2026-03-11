@@ -7,7 +7,7 @@ import CTA from '../components/landing/CTA';
 
 export default function Home() {
   return (
-    <div className="bg-brand-bg min-h-screen selection:bg-brand-primary/30 selection:text-white">
+    <div className="bg-white dark:bg-[#020817] min-h-screen selection:bg-blue-600/30 selection:text-white transition-colors duration-300">
       <Hero />
       <HowItWorks />
       <Features />

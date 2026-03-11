@@ -37,11 +37,11 @@ const USE_CASES: UseCaseData[] = [
     summary: "Maximize FPS and graphical fidelity. The GPU is your king.",
     image: "https://placehold.co/800x400/ffffff/black?text=Gaming+Build+Setup",
     details: `
-      <h3 class="font-black text-black text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 underline-offset-4">The Priority: GPU > CPU > RAM</h3>
-      <p class="mb-4 text-gray-600 font-medium">For a purely gaming machine, your Graphics Card (GPU) is the most critical component. It handles rendering textures, lighting, and models. Allocate 40-50% of your budget here.</p>
+      <h3 class="font-black text-black dark:text-white text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 dark:decoration-blue-400 underline-offset-4">The Priority: GPU > CPU > RAM</h3>
+      <p class="mb-4 text-gray-600 dark:text-slate-400 font-medium">For a purely gaming machine, your Graphics Card (GPU) is the most critical component. It handles rendering textures, lighting, and models. Allocate 40-50% of your budget here.</p>
       
-      <h4 class="font-black text-blue-600 mb-3 uppercase tracking-widest text-[10px]">Key Specs to Watch:</h4>
-      <ul class="list-disc pl-5 mb-6 space-y-2 text-gray-500 font-bold uppercase text-[9px] tracking-wider">
+      <h4 class="font-black text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-widest text-[10px]">Key Specs to Watch:</h4>
+      <ul class="list-disc pl-5 mb-6 space-y-2 text-gray-500 dark:text-slate-500 font-bold uppercase text-[9px] tracking-wider">
         <li><strong>VRAM:</strong> 8GB is the absolute minimum for 1080p today. Aim for 12GB+ for 1440p gaming.</li>
         <li><strong>Single Core Speed:</strong> Games prefer fast individual cores over many slow cores.</li>
         <li><strong>Refresh Rate:</strong> Ensure your monitor matches your GPU's capabilities.</li>
@@ -89,8 +89,8 @@ const USE_CASES: UseCaseData[] = [
     summary: "Video editing, 3D rendering, and compiling code. Core count is everything.",
     image: "https://placehold.co/800x400/ffffff/black?text=Workstation+Setup",
     details: `
-      <h3 class="font-black text-black text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 underline-offset-4">The Priority: CPU > RAM > Storage</h3>
-      <p class="mb-4 text-gray-600 font-medium">For tasks like Premiere Pro, Blender, or code compilation, you need raw multi-threaded processing power.</p>
+      <h3 class="font-black text-black dark:text-white text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 dark:decoration-blue-400 underline-offset-4">The Priority: CPU > RAM > Storage</h3>
+      <p class="mb-4 text-gray-600 dark:text-slate-400 font-medium">For tasks like Premiere Pro, Blender, or code compilation, you need raw multi-threaded processing power.</p>
     `,
     specs: {
       amd_nvidia: {
@@ -134,8 +134,8 @@ const USE_CASES: UseCaseData[] = [
     summary: "Gaming while broadcasting requires dedicated encoding hardware.",
     image: "https://placehold.co/800x400/ffffff/black?text=Streaming+Setup",
     details: `
-      <h3 class="font-black text-black text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 underline-offset-4">The Priority: Encoder Quality</h3>
-      <p class="mb-4 text-gray-600 font-medium">NVIDIA GPUs are industry standard for streamers due to their <strong>NVENC</strong> encoder.</p>
+      <h3 class="font-black text-black dark:text-white text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 dark:decoration-blue-400 underline-offset-4">The Priority: Encoder Quality</h3>
+      <p class="mb-4 text-gray-600 dark:text-slate-400 font-medium">NVIDIA GPUs are industry standard for streamers due to their <strong>NVENC</strong> encoder.</p>
     `,
     specs: {
       amd_nvidia: {
@@ -179,8 +179,8 @@ const USE_CASES: UseCaseData[] = [
     summary: "Reliability, silence, and speed for browsing and documents.",
     image: "https://placehold.co/800x400/ffffff/black?text=Office+Setup",
     details: `
-      <h3 class="font-black text-black text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 underline-offset-4">The Priority: SSD > CPU > RAM</h3>
-      <p class="mb-4 text-gray-600 font-medium">A quality NVMe SSD ensures Windows opens in seconds. Modern CPUs have powerful integrated graphics.</p>
+      <h3 class="font-black text-black dark:text-white text-2xl mb-4 uppercase tracking-tighter italic underline decoration-4 decoration-blue-600 dark:decoration-blue-400 underline-offset-4">The Priority: SSD > CPU > RAM</h3>
+      <p class="mb-4 text-gray-600 dark:text-slate-400 font-medium">A quality NVMe SSD ensures Windows opens in seconds. Modern CPUs have powerful integrated graphics.</p>
     `,
     specs: {
       amd_nvidia: {
@@ -241,18 +241,18 @@ export default function Guide() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black p-4 md:p-8 font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-white p-4 md:p-8 font-sans selection:bg-blue-600 selection:text-white transition-colors duration-300">
       <div className="max-w-[1400px] mx-auto">
         <header className="mb-20">
             <h1 className="text-6xl font-black mb-4 uppercase tracking-tighter italic">ASSEMBLY GUIDE</h1>
-            <div className="h-2 w-32 bg-blue-600 mb-6"></div>
-            <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[10px]">Technical Documentation for PC Hardware Integration.</p>
+            <div className="h-2 w-32 bg-blue-600 dark:bg-blue-400 mb-6"></div>
+            <p className="text-gray-400 dark:text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px]">Technical Documentation for PC Hardware Integration.</p>
         </header>
 
         {/* 1. USE CASE ARTICLES */}
         <section className="mb-32">
             <div className="flex items-center gap-4 mb-12">
-                <BookOpen className="text-blue-600" size={24} />
+                <BookOpen className="text-blue-600 dark:text-blue-400" size={24} />
                 <h2 className="text-2xl font-black uppercase tracking-tight italic">Integration Vectors</h2>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
@@ -260,16 +260,16 @@ export default function Guide() {
                     <div 
                         key={idx}
                         onClick={() => openArticle(idx)}
-                        className="bg-white border-2 border-black p-8 group cursor-pointer transition-all hover:shadow-[8px_8px_0px_0px_rgba(37,99,235,1)] hover:-translate-y-1"
+                        className="bg-white dark:bg-[#121212] border-2 border-black dark:border-white/10 p-8 group cursor-pointer transition-all hover:shadow-[8px_8px_0px_0px_rgba(37,99,235,1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(37,99,235,0.3)] hover:-translate-y-1"
                     >
                         <div className="flex items-center gap-6 mb-6">
-                            <div className="w-14 h-14 bg-black text-white flex items-center justify-center transition-colors group-hover:bg-blue-600">
+                            <div className="w-14 h-14 bg-black dark:bg-[#0a0a0a] text-white flex items-center justify-center transition-colors group-hover:bg-blue-600 dark:group-hover:bg-blue-500 border-2 border-transparent group-hover:border-blue-600">
                                 {useCase.icon}
                             </div>
-                            <h3 className="text-2xl font-black uppercase tracking-tighter">{useCase.title}</h3>
+                            <h3 className="text-2xl font-black uppercase tracking-tighter italic">{useCase.title}</h3>
                         </div>
-                        <p className="text-gray-500 text-sm leading-tight font-bold uppercase mb-8 tracking-wide">{useCase.summary}</p>
-                        <div className="flex items-center gap-3 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-5 transition-all">
+                        <p className="text-gray-500 dark:text-slate-500 text-sm leading-tight font-bold uppercase mb-8 tracking-wide italic">{useCase.summary}</p>
+                        <div className="flex items-center gap-3 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-[0.2em] group-hover:gap-5 transition-all">
                             Access Module <span>&rarr;</span>
                         </div>
                     </div>
@@ -279,7 +279,7 @@ export default function Guide() {
 
         {/* 2. ASSEMBLY ORDER */}
         <section className="mb-32">
-            <h2 className="text-4xl font-black mb-16 uppercase tracking-tighter text-center italic">SYSTEM INTEGRATION FLOW</h2>
+            <h2 className="text-4xl font-black mb-16 uppercase tracking-tighter text-center italic dark:text-white">SYSTEM INTEGRATION FLOW</h2>
             <AssemblyFlow />
         </section>
 
@@ -287,14 +287,14 @@ export default function Guide() {
         <div className="grid lg:grid-cols-2 gap-16 mb-20">
             <section>
                 <div className="flex items-center gap-4 mb-10">
-                    <HelpCircle className="text-blue-600" size={24} />
+                    <HelpCircle className="text-blue-600 dark:text-blue-400" size={24} />
                     <h2 className="text-2xl font-black uppercase tracking-tight italic">Glossary</h2>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                     {GLOSSARY.map((item) => (
-                        <div key={item.term} className="bg-gray-50 p-6 border-l-4 border-black">
-                            <div className="font-black text-blue-600 uppercase tracking-widest mb-2 text-[10px]">{item.term}</div>
-                            <div className="text-gray-600 text-[11px] leading-tight font-bold uppercase">{item.def}</div>
+                        <div key={item.term} className="bg-gray-50 dark:bg-[#121212] p-6 border-l-4 border-black dark:border-blue-600">
+                            <div className="font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2 text-[10px] italic">{item.term}</div>
+                            <div className="text-gray-600 dark:text-slate-400 text-[11px] leading-tight font-bold uppercase">{item.def}</div>
                         </div>
                     ))}
                 </div>
@@ -302,7 +302,7 @@ export default function Guide() {
 
             <section>
                 <div className="flex items-center gap-4 mb-10">
-                    <TrendingUp className="text-blue-600" size={24} />
+                    <TrendingUp className="text-blue-600 dark:text-blue-400" size={24} />
                     <h2 className="text-2xl font-black uppercase tracking-tight italic">Market Intel</h2>
                 </div>
                 <div className="space-y-4">
@@ -311,9 +311,9 @@ export default function Guide() {
                         { t: "NVMe Standards", d: "Gen 4 prices have stabilized; Gen 3 is legacy for new builds." },
                         { t: "White Build Premium", d: "Expected 'White Tax' of 5-15% on aesthetic hardware." }
                     ].map((trend) => (
-                        <div key={trend.t} className="bg-white p-6 border-2 border-black">
-                            <h4 className="font-black text-black uppercase text-xs mb-2 tracking-widest">{trend.t}</h4>
-                            <p className="text-[11px] text-gray-500 leading-tight font-bold uppercase">{trend.d}</p>
+                        <div key={trend.t} className="bg-white dark:bg-[#121212] p-6 border-2 border-black dark:border-white/10 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
+                            <h4 className="font-black text-black dark:text-white uppercase text-xs mb-2 tracking-widest italic">{trend.t}</h4>
+                            <p className="text-[11px] text-gray-500 dark:text-slate-500 leading-tight font-bold uppercase">{trend.d}</p>
                         </div>
                     ))}
                 </div>
@@ -322,12 +322,12 @@ export default function Guide() {
 
         {/* MODAL FOR ARTICLES */}
         {selectedArticle !== null && (
-            <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-white/95 backdrop-blur-md animate-in fade-in duration-200">
-                <div className="bg-white border-2 border-black shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] w-full max-w-5xl max-h-[90vh] overflow-y-auto relative flex flex-col scrollbar-thin">
+            <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-[#121212] border-4 border-black dark:border-blue-600 shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] dark:shadow-[16px_16px_0px_0px_rgba(37,99,235,0.2)] w-full max-w-5xl max-h-[90vh] overflow-y-auto relative flex flex-col scrollbar-thin dark:scrollbar-thumb-blue-600">
                     
                     <button 
                         onClick={() => setSelectedArticle(null)}
-                        className="absolute top-6 right-6 p-2 bg-black text-white hover:bg-blue-600 transition-colors z-20"
+                        className="absolute top-6 right-6 p-2 bg-black dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors z-20"
                     >
                         <X size={20} />
                     </button>
@@ -335,16 +335,16 @@ export default function Guide() {
                     <div className="p-10">
                         <div className="mb-12">
                             <div 
-                                className="prose prose-sm max-w-none"
+                                className="prose prose-sm max-w-none dark:prose-invert"
                                 dangerouslySetInnerHTML={{ __html: USE_CASES[selectedArticle].details }}
                             />
                         </div>
 
-                        <div className="bg-gray-50 border-2 border-black overflow-hidden">
-                            <div className="p-8 border-b-2 border-black text-center">
-                                <h3 className="font-black text-black uppercase tracking-[0.3em] text-sm mb-8 italic">OPTIMAL CONFIGURATION</h3>
+                        <div className="bg-gray-50 dark:bg-[#0a0a0a]/50 border-2 border-black dark:border-white/10 overflow-hidden">
+                            <div className="p-8 border-b-2 border-black dark:border-white/10 text-center">
+                                <h3 className="font-black text-black dark:text-white uppercase tracking-[0.3em] text-sm mb-8 italic">OPTIMAL CONFIGURATION</h3>
                                 
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border-2 border-black divide-x-2 divide-black">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border-2 border-black dark:border-white/10 divide-x-2 divide-black dark:divide-white/10">
                                     {[
                                         { k: 'amd_nvidia', l: 'AMD+NV' },
                                         { k: 'amd_amd', l: 'AMD+AMD' },
@@ -355,7 +355,7 @@ export default function Guide() {
                                             key={m.k}
                                             onClick={() => setSpecMode(m.k as SpecMode)}
                                             className={`py-4 text-[10px] font-black uppercase tracking-widest transition-all ${
-                                                specMode === m.k ? 'bg-black text-white' : 'bg-white text-gray-400 hover:bg-gray-100'
+                                                specMode === m.k ? 'bg-black dark:bg-blue-600 text-white' : 'bg-white dark:bg-[#1a1a1a] text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-[#252525]'
                                             }`}
                                         >
                                             {m.l}
@@ -364,7 +364,7 @@ export default function Guide() {
                                 </div>
                             </div>
 
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-black">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-black dark:bg-white/10">
                                 {[
                                     { label: 'CPU PLATFORM', value: USE_CASES[selectedArticle].specs[specMode].cpu },
                                     { label: 'GRAPHICS CORE', value: USE_CASES[selectedArticle].specs[specMode].gpu },
@@ -373,17 +373,17 @@ export default function Guide() {
                                     { label: 'STORAGE ARRAY', value: USE_CASES[selectedArticle].specs[specMode].storage },
                                     { label: 'POWER CELL', value: USE_CASES[selectedArticle].specs[specMode].psu },
                                 ].map((spec, i) => (
-                                    <div key={i} className="bg-white p-8 flex flex-col justify-center">
-                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">{spec.label}</span>
-                                        <span className="text-xs font-black text-black uppercase tracking-tight">{spec.value}</span>
+                                    <div key={i} className="bg-white dark:bg-[#121212] p-8 flex flex-col justify-center transition-colors">
+                                        <span className="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2 italic">{spec.label}</span>
+                                        <span className="text-xs font-black text-black dark:text-white uppercase tracking-tight italic">{spec.value}</span>
                                     </div>
                                 ))}
                             </div>
 
                             {USE_CASES[selectedArticle].specs[specMode].notes && (
-                                <div className="bg-blue-50 border-t-2 border-black p-6 flex items-start gap-4">
-                                    <AlertTriangle className="text-blue-600 flex-shrink-0" size={20} />
-                                    <p className="text-[10px] text-blue-900 leading-relaxed font-bold uppercase italic">
+                                <div className="bg-blue-50 dark:bg-blue-900/20 border-t-2 border-black dark:border-white/10 p-6 flex items-start gap-4">
+                                    <AlertTriangle className="text-blue-600 dark:text-blue-400 flex-shrink-0" size={20} />
+                                    <p className="text-[10px] text-blue-900 dark:text-blue-200 leading-relaxed font-bold uppercase italic">
                                         NOTE: {USE_CASES[selectedArticle].specs[specMode].notes}
                                     </p>
                                 </div>
@@ -391,10 +391,10 @@ export default function Guide() {
                         </div>
                     </div>
                     
-                    <div className="p-8 bg-white border-t-2 border-black mt-auto flex justify-end">
+                    <div className="p-8 bg-white dark:bg-[#121212] border-t-2 border-black dark:border-white/10 mt-auto flex justify-end">
                         <button 
                             onClick={() => setSelectedArticle(null)}
-                            className="px-10 py-4 bg-black hover:bg-blue-600 text-white font-black uppercase tracking-widest text-[10px] transition-colors"
+                            className="px-10 py-4 bg-black dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white font-black uppercase tracking-widest text-[10px] transition-all italic shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]"
                         >
                             Close Archive
                         </button>

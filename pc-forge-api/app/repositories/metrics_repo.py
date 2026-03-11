@@ -32,9 +32,10 @@ def get_system_metrics():
 
     # 6. Latest Builds
     cur.execute("""
-        SELECT title, user_name, total_price_pkr, created_at 
-        FROM gallery_builds 
-        ORDER BY created_at DESC 
+        SELECT b.title, u.username as user_name, b.total_price_pkr, b.created_at 
+        FROM gallery_builds b
+        LEFT JOIN users u ON b.user_id = u.id
+        ORDER BY b.created_at DESC 
         LIMIT 5;
     """)
     recent_activity = [dict(row) for row in cur.fetchall()]

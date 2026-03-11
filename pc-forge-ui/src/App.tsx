@@ -9,6 +9,7 @@ import Gallery from './pages/Gallery';
 import GalleryBuildDetails from './pages/GalleryBuildDetails';
 import Auth from './pages/Auth';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminInventory from './pages/AdminInventory';
 import MyBuilds from './pages/MyBuilds';
 import { BuildProvider } from './context/BuildContext';
 
@@ -28,6 +29,7 @@ function App() {
             <Route path="my-builds" element={<MyBuilds />} />
             <Route path="login" element={<Auth />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/inventory" element={<AdminInventory />} />
           </Route>
         </Routes>
       </BrowserRouter>

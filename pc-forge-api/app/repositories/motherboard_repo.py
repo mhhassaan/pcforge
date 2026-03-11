@@ -2,7 +2,7 @@ from app.db import get_connection
 
 import psycopg2.extras
 
-def get_compatible_motherboards(cpu_id: str):
+def get_compatible_motherboards(cpu_id: str, sort_by: str = None, order: str = "asc"):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -24,8 +24,17 @@ def get_compatible_motherboards(cpu_id: str):
         FROM vendor_prices
         ORDER BY product_id, price ASC
     ) v ON m.product_id = v.product_id
-    WHERE c.product_id = %s;
+    WHERE c.product_id = %s
     """
+
+    # Sorting logic
+    valid_sort_cols = {
+        "product_name": "p.product_name",
+        "price_pkr": "price_pkr"
+    }
+    sort_col = valid_sort_cols.get(sort_by, "p.product_name")
+    sort_order = "ASC" if order.lower() == "asc" else "DESC"
+    sql += f" ORDER BY {sort_col} {sort_order}"
 
     cur.execute(sql, (cpu_id,))
     rows = cur.fetchall()

@@ -8,8 +8,8 @@ def save_build(build_data: dict):
     sql = """
     INSERT INTO gallery_builds (
         title, description, cpu_id, motherboard_id, ram_id, 
-        gpu_id, psu_id, case_id, storage_id, user_name, user_id, total_price_pkr
-    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        gpu_id, psu_id, case_id, storage_id, user_id, total_price_pkr
+    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     RETURNING id;
     """
     
@@ -23,7 +23,6 @@ def save_build(build_data: dict):
         build_data.get('psu_id'),
         build_data.get('case_id'),
         build_data.get('storage_id'),
-        build_data.get('user_name'),
         build_data.get('user_id'),
         build_data.get('total_price_pkr')
     ))
@@ -41,10 +40,12 @@ def get_builds_by_user_id(user_id: int):
     sql = """
     SELECT 
         g.*,
+        u.username as user_name,
         p_cpu.product_name as cpu_name,
         p_gpu.product_name as gpu_name,
         p_case.product_name as case_name
     FROM gallery_builds g
+    LEFT JOIN users u ON g.user_id = u.id
     LEFT JOIN products p_cpu ON g.cpu_id = p_cpu.product_id
     LEFT JOIN products p_gpu ON g.gpu_id = p_gpu.product_id
     LEFT JOIN products p_case ON g.case_id = p_case.product_id
@@ -66,10 +67,12 @@ def get_all_builds():
     sql = """
     SELECT 
         g.*,
+        COALESCE(u.username, 'Anonymous') as user_name,
         p_cpu.product_name as cpu_name,
         p_gpu.product_name as gpu_name,
         p_case.product_name as case_name
     FROM gallery_builds g
+    LEFT JOIN users u ON g.user_id = u.id
     LEFT JOIN products p_cpu ON g.cpu_id = p_cpu.product_id
     LEFT JOIN products p_gpu ON g.gpu_id = p_gpu.product_id
     LEFT JOIN products p_case ON g.case_id = p_case.product_id
@@ -89,6 +92,7 @@ def get_build_by_id(build_id: int):
     sql = """
     SELECT 
         g.*,
+        COALESCE(u.username, 'Anonymous') as user_name,
         p_cpu.product_name as cpu_name,
         p_mb.product_name as motherboard_name,
         p_ram.product_name as ram_name,
@@ -97,6 +101,7 @@ def get_build_by_id(build_id: int):
         p_case.product_name as case_name,
         p_storage.product_name as storage_name
     FROM gallery_builds g
+    LEFT JOIN users u ON g.user_id = u.id
     LEFT JOIN products p_cpu ON g.cpu_id = p_cpu.product_id
     LEFT JOIN products p_mb ON g.motherboard_id = p_mb.product_id
     LEFT JOIN products p_ram ON g.ram_id = p_ram.product_id

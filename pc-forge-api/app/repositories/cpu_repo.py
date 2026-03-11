@@ -10,13 +10,14 @@ def get_all_cpus():
         p.product_name,
         p.manufacturer,
         v.price as price_pkr
-    FROM cpu_specs c
-    JOIN products p ON c.product_id = p.product_id
+    FROM products p
+    LEFT JOIN cpu_specs c ON p.product_id = c.product_id
     LEFT JOIN (
         SELECT DISTINCT ON (product_id) product_id, price
         FROM vendor_prices
         ORDER BY product_id, price ASC
-    ) v ON p.product_id = v.product_id;
+    ) v ON p.product_id = v.product_id
+    WHERE p.category = 'cpu';
     """
 
     cur.execute(sql)

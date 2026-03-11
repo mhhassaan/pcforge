@@ -16,7 +16,7 @@ export default function SortFilter() {
   
   const currentSort = searchParams.get('sort_by') || '';
   const currentOrder = searchParams.get('order') || 'asc';
-  const currentValue = `${currentSort}:${currentOrder}`;
+  const currentValue = currentSort ? `${currentSort}:${currentOrder}` : ':asc';
 
   const selectedOption = SORT_OPTIONS.find(opt => opt.value === currentValue) || SORT_OPTIONS[0];
 
@@ -37,25 +37,25 @@ export default function SortFilter() {
 
   return (
     <div className="flex items-center gap-3 whitespace-nowrap">
-      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">SORT BY:</label>
+      <label className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] italic">ORGANIZE:</label>
       
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button className="flex items-center gap-2 bg-slate-900 border border-slate-700 hover:border-blue-500 text-slate-300 hover:text-white px-4 py-2 rounded-lg font-black text-[10px] uppercase tracking-wide transition-colors outline-none focus:ring-2 focus:ring-blue-500/50">
+          <button className="flex items-center gap-2 bg-white dark:bg-[#1a1a1a] border border-black dark:border-white/10 hover:bg-gray-100 dark:hover:bg-[#252525] text-black dark:text-white px-4 py-1.5 rounded-none font-black text-[10px] uppercase tracking-widest transition-colors outline-none focus:ring-2 focus:ring-blue-600">
             {selectedOption.label}
             <ChevronDown size={14} />
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
-          <DropdownMenu.Content className="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl p-1 w-56 z-[100] animate-in fade-in zoom-in-95 duration-100" sideOffset={5} align="end">
+          <DropdownMenu.Content className="bg-white dark:bg-[#1a1a1a] border-2 border-black dark:border-blue-600 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.2)] p-1 w-56 z-[100] animate-in fade-in zoom-in-95 duration-100" sideOffset={5} align="end">
             {SORT_OPTIONS.map((option) => (
               <DropdownMenu.Item 
                 key={option.value}
-                className="flex items-center gap-2 px-3 py-2 text-[10px] font-black text-slate-400 hover:text-white hover:bg-slate-800 rounded cursor-pointer outline-none uppercase tracking-wide"
+                className="flex items-center justify-between px-3 py-2 text-[10px] font-black text-gray-400 dark:text-slate-500 hover:text-white hover:bg-black dark:hover:bg-blue-600 rounded-none cursor-pointer outline-none uppercase tracking-widest"
                 onSelect={() => handleSortChange(option.value)}
               >
-                {currentValue === option.value && <Check size={14} className="text-blue-500" />}
-                <span className={currentValue === option.value ? 'text-white' : ''}>{option.label}</span>
+                <span>{option.label}</span>
+                {currentValue === option.value && <Check size={12} className="text-blue-600 dark:text-blue-400" />}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Content>

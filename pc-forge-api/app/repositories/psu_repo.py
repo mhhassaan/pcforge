@@ -1,7 +1,7 @@
 from app.db import get_connection
 import psycopg2.extras
 
-def get_compatible_psus(cpu_id: str, gpu_id: str):
+def get_compatible_psus(cpu_id: str, gpu_id: str, sort_by: str = None, order: str = "asc"):
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -24,8 +24,17 @@ def get_compatible_psus(cpu_id: str, gpu_id: str):
     ) v ON p.product_id = v.product_id
     WHERE p.wattage >= (c.tdp_watts + g.tdp_watts + 100)
       AND p.pcie_6_plus_2_pin >= g.pcie_8_pin
-      AND p.pcie_12vhpwr >= g.pcie_12vhpwr;
+      AND p.pcie_12vhpwr >= g.pcie_12vhpwr
     """
+
+    # Sorting logic
+    valid_sort_cols = {
+        "product_name": "prod.product_name",
+        "price_pkr": "price_pkr"
+    }
+    sort_col = valid_sort_cols.get(sort_by, "prod.product_name")
+    sort_order = "ASC" if order.lower() == "asc" else "DESC"
+    sql += f" ORDER BY {sort_col} {sort_order}"
 
     cur.execute(sql, (cpu_id, gpu_id))
     rows = cur.fetchall()
