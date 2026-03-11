@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Cpu, Activity, ShieldCheck, Zap, Maximize, Database, Layout } from 'lucide-react';
+import { ArrowRight, Cpu, Activity, ShieldCheck, Zap, Maximize, Layout } from 'lucide-react';
 import { MorphingText } from '../ui/MorphingText';
 import { DottedMap } from '../ui/DottedMap';
 import { Highlighter } from '../ui/Highlighter';
