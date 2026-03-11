@@ -48,7 +48,7 @@ interface TextAnimateProps extends Omit<MotionProps, "children"> {
   /**
    * The text content to animate
    */
-  children: string
+  children: string | string[]
   /**
    * The class name to be applied to the component
    */
@@ -419,10 +419,10 @@ const TextAnimateBase = ({
         exit="exit"
         className={cn("whitespace-pre-wrap", className)}
         viewport={{ once }}
-        aria-label={accessible ? children : undefined}
+        aria-label={accessible ? textContent : undefined}
         {...props}
       >
-        {accessible && <span className="sr-only">{children}</span>}
+        {accessible && <span className="sr-only">{textContent}</span>}
         {segments.map((segment, i) => (
           <motion.span
             key={`${by}-${segment}-${i}`}
