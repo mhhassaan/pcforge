@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { fetchIncompleteProducts, fetchCategorySchema, updateProductSpecs } from '../api/pcforge';
 import { 
   Package, 
@@ -8,7 +8,6 @@ import {
   Save, 
   X,
   Search,
-  Filter,
   CheckCircle2,
   Database,
   Lock,
