@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { fetchComponents } from '../api/pcforge';
 import type { Component } from '../types/pcforge';
-import { X, Search, Plus, Trash2, ChevronDown, Check } from 'lucide-react';
+import { X, Search, Plus, ChevronDown, Check, Scale, Info } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Modal from '../components/ui/Modal';
+
+// New Components
+import ComparisonCard from '../components/comparison/ComparisonCard';
+import ComparisonControls from '../components/comparison/ComparisonControls';
+import ComparisonTable from '../components/comparison/ComparisonTable';
 
 const CATEGORIES = [
   { label: 'CPU', value: 'cpu' },
@@ -24,15 +29,22 @@ export default function Compare() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalProducts, setModalProducts] = useState<Component[]>([]);
   const [isModalLoading, setIsModalLoading] = useState(false);
+  const [replaceIndex, setReplaceIndex] = useState<number | null>(null);
+
+  // Controls State
+  const [showOnlyDifferences, setShowOnlyDifferences] = useState(false);
+  const [highlightBestValues, setHighlightBestValues] = useState(true);
+  const [sortBy, setSortBy] = useState<'price' | 'performance' | 'none'>('none');
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const productLimit = isMobile ? 3 : 5;
 
-  const openSelectionModal = async () => {
-    if (products.length >= productLimit) {
-        alert(`Maximum ${productLimit} products allowed for comparison on this device.`);
+  const openSelectionModal = async (index: number | null = null) => {
+    if (index === null && products.length >= productLimit) {
+        alert(`MAXIMUM_${productLimit}_UNITS_REACHED_FOR_DEVICE`);
         return;
     }
+    setReplaceIndex(index);
     setIsModalOpen(true);
     setIsModalLoading(true);
     try {
@@ -61,14 +73,22 @@ export default function Compare() {
   };
 
   const addToCompare = (product: Component) => {
-    if (products.length >= productLimit) {
-      alert(`Maximum ${productLimit} products allowed for comparison on this device.`);
-      return;
+    if (replaceIndex !== null) {
+        const newProducts = [...products];
+        newProducts[replaceIndex] = product;
+        setProducts(newProducts);
+        setReplaceIndex(null);
+    } else {
+        if (products.length >= productLimit) {
+            alert(`MAXIMUM_${productLimit}_UNITS_REACHED`);
+            return;
+        }
+        if (products.find(p => p.id === product.id)) return;
+        setProducts([...products, product]);
     }
-    if (products.find(p => p.id === product.id)) return;
-    setProducts([...products, product]);
     setSearchQuery('');
     setSearchResults([]);
+    setIsModalOpen(false);
   };
 
   const removeFromCompare = (id: string) => {
@@ -77,276 +97,271 @@ export default function Compare() {
 
   const clearAll = () => setProducts([]);
 
-  const allSpecKeys = Array.from(new Set(products.flatMap(p => Object.keys(p.specs || {}))));
-  
-  const topLevelRows = [
-    { label: 'Lowest Price', key: 'price_pkr', format: (v: any) => v ? `Rs. ${v.toLocaleString()}` : 'N/A', color: 'text-blue-600 dark:text-blue-400' },
-  ];
-
-  const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: isMobile ? '80px repeat(3, 1fr)' : '150px repeat(5, 1fr)',
+  const getMockScore = (p: Component) => {
+    const price = p.price_pkr || 0;
+    return 70 + (price % 30);
   };
-  const placeholdersNeeded = productLimit - products.length;
+
+  const sortedProducts = useMemo(() => {
+    let result = [...products];
+    if (sortBy === 'price') {
+      result.sort((a, b) => (a.price_pkr || 0) - (b.price_pkr || 0));
+    } else if (sortBy === 'performance') {
+      result.sort((a, b) => getMockScore(b) - getMockScore(a));
+    }
+    return result;
+  }, [products, sortBy]);
+
+  const bestValueId = useMemo(() => {
+    if (products.length < 2) return null;
+    return [...products].sort((a, b) => (a.price_pkr || 0) - (b.price_pkr || 0))[0]?.id;
+  }, [products]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-white font-sans p-3 md:p-8 selection:bg-blue-600 selection:text-white overflow-x-hidden transition-colors duration-300">
-      {/* Header / Controls */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 md:mb-12 bg-gray-50 dark:bg-[#121212] p-4 md:p-6 border-2 border-black dark:border-white/10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.2)]">
-        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
-          <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter italic whitespace-nowrap dark:text-white">SIDE-BY-SIDE</h1>
-          
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button className="flex items-center gap-2 bg-white dark:bg-[#1a1a1a] border border-black dark:border-white/10 hover:bg-gray-100 dark:hover:bg-[#252525] text-black dark:text-white px-3 py-2 rounded-none font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] transition-colors outline-none focus:ring-2 focus:ring-blue-600">
-                {selectedCategory.label}
-                <ChevronDown size={12} />
-              </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content className="bg-white dark:bg-[#1a1a1a] border-2 border-black dark:border-blue-600 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.2)] p-1 w-56 z-[100] animate-in fade-in zoom-in-95 duration-100" sideOffset={5} align="start">
-                {CATEGORIES.map((cat) => (
-                  <DropdownMenu.Item 
-                    key={cat.value}
-                    className="flex items-center justify-between px-3 py-2 text-[10px] font-black text-gray-400 dark:text-slate-500 hover:text-white hover:bg-black dark:hover:bg-blue-600 rounded-none cursor-pointer outline-none uppercase tracking-widest"
-                    onSelect={() => {
-                        setSelectedCategory(cat);
-                        setProducts([]);
-                    }}
-                  >
-                    <span>{cat.label}</span>
-                    {selectedCategory.value === cat.value && <Check size={12} className="text-blue-600 dark:text-blue-400" />}
-                  </DropdownMenu.Item>
-                ))}
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
-        </div>
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-white font-sans selection:bg-blue-600 selection:text-white transition-colors duration-300 pb-32">
+      {/* Background Grid Pattern */}
+      <div className="fixed inset-0 pointer-events-none opacity-5 dark:opacity-10 z-0 overflow-hidden">
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+      </div>
 
-        {/* Search Bar */}
-        <div className="relative w-full md:max-w-md">
-            <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-600" />
-                <input 
-                    type="text" 
-                    placeholder={`FIND ${selectedCategory.label}...`} 
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full bg-white dark:bg-[#1a1a1a] border border-black dark:border-white/10 rounded-none py-2 pl-9 pr-4 text-black dark:text-white text-[9px] md:text-[10px] font-black placeholder:text-gray-300 dark:placeholder:text-slate-600 focus:border-blue-600 outline-none transition-all uppercase tracking-[0.2em]"
-                />
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10 pt-12 md:pt-20">
+        {/* Header Section */}
+        <header className="mb-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+            <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-black dark:bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.3em] italic border-2 border-black">
+                    <Scale size={14} /> Component Comparison
+                </div>
+                <h1 className="text-5xl md:text-7xl font-black text-black dark:text-white uppercase tracking-tighter leading-none italic">
+                    SIDE-BY-SIDE
+                </h1>
+                <p className="text-gray-600 dark:text-slate-400 text-lg font-medium max-w-lg uppercase leading-tight italic">
+                    Analyze hardware specifications and performance data.
+                </p>
             </div>
-            
-            {/* Search Results Dropdown */}
-            {searchResults.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#1a1a1a] border-2 border-black dark:border-blue-600 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(37,99,235,0.2)] overflow-hidden z-50">
-                    {searchResults.map(product => (
-                        <button 
-                            key={product.id}
-                            onClick={() => addToCompare(product)}
-                            className="flex items-center gap-3 w-full p-3 hover:bg-gray-50 dark:hover:bg-[#252525] text-left transition-colors border-b border-gray-100 dark:border-white/5 last:border-0"
-                        >
-                            <div className="w-8 h-8 bg-gray-100 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/5 flex items-center justify-center flex-shrink-0">
-                                <span className="text-[7px] text-gray-400 font-black uppercase">IMG</span>
-                            </div>
-                            <div className="min-w-0">
-                                <div className="text-[9px] font-black text-black dark:text-white uppercase tracking-tight line-clamp-1">{product.name}</div>
-                                <div className="text-[9px] text-blue-600 dark:text-blue-400 font-mono font-black">
-                                    {product.price_pkr ? `Rs. ${product.price_pkr.toLocaleString()}` : 'Price TBD'}
-                                </div>
-                            </div>
-                            <Plus size={14} className="ml-auto text-gray-300 hover:text-black dark:text-slate-600 dark:hover:text-white flex-shrink-0" />
+
+            <div className="flex flex-wrap items-center gap-4">
+                <DropdownMenu.Root>
+                    <DropdownMenu.Trigger asChild>
+                        <button className="flex items-center gap-4 bg-white dark:bg-[#121212] border-2 border-black dark:border-white/10 hover:bg-black hover:text-white dark:hover:bg-blue-600 transition-colors text-black dark:text-white px-6 py-4 font-black text-xs uppercase tracking-[0.2em] italic outline-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.2)]">
+                            {selectedCategory.label}
+                            <ChevronDown size={14} />
                         </button>
-                    ))}
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Portal>
+                        <DropdownMenu.Content className="bg-white dark:bg-[#121212] border-2 border-black dark:border-white/10 p-1 w-64 z-[100] animate-in fade-in zoom-in-95 duration-100 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(37,99,235,0.2)]" sideOffset={8} align="end">
+                            {CATEGORIES.map((cat) => (
+                            <DropdownMenu.Item 
+                                key={cat.value}
+                                className="flex items-center justify-between px-4 py-3 text-[10px] font-black text-gray-400 dark:text-slate-500 hover:text-white hover:bg-black dark:hover:bg-blue-600 cursor-pointer outline-none uppercase tracking-widest italic"
+                                onSelect={() => {
+                                    setSelectedCategory(cat);
+                                    setProducts([]);
+                                }}
+                            >
+                                <span>{cat.label}</span>
+                                {selectedCategory.value === cat.value && <Check size={14} className="text-blue-600 dark:text-blue-400" />}
+                            </DropdownMenu.Item>
+                            ))}
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+
+                <div className="relative min-w-[320px]">
+                    <Search size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-black dark:text-white" />
+                    <input 
+                        type="text" 
+                        placeholder={`Search ${selectedCategory.label}...`} 
+                        value={searchQuery}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        className="w-full bg-white dark:bg-[#121212] border-2 border-black dark:border-white/10 py-4 pl-14 pr-6 text-black dark:text-white text-xs font-black placeholder:text-gray-300 dark:placeholder:text-slate-800 focus:border-blue-600 dark:focus:border-blue-400 outline-none transition-all uppercase tracking-[0.2em] italic shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.2)]"
+                    />
+                    
+                    {searchResults.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-4 bg-white dark:bg-[#121212] border-2 border-black dark:border-white/10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(37,99,235,0.3)] z-50 overflow-hidden">
+                            <div className="p-2 border-b-2 border-black dark:border-white/10 flex justify-between items-center bg-gray-50 dark:bg-black">
+                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-3 italic">Search Results</span>
+                                <button onClick={() => setSearchResults([])} className="p-1 hover:bg-red-600 hover:text-white transition-colors">
+                                    <X size={14} />
+                                </button>
+                            </div>
+                            {searchResults.map(product => (
+                                <button 
+                                    key={product.id}
+                                    onClick={() => addToCompare(product)}
+                                    className="flex items-center gap-4 w-full p-4 hover:bg-blue-600 hover:text-white transition-all group border-b border-black dark:border-white/5 last:border-0"
+                                >
+                                    <div className="w-12 h-12 bg-gray-50 dark:bg-black rounded-none border border-black dark:border-white/10 flex items-center justify-center flex-shrink-0">
+                                        {product.image_url ? (
+                                            <img src={product.image_url} alt="" className="w-full h-full object-contain dark:invert" />
+                                        ) : (
+                                            <div className="text-[7px] text-gray-400 font-black">IMAGE</div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="text-[11px] font-black uppercase tracking-tight line-clamp-1 italic">{product.name}</div>
+                                        <div className="text-[10px] font-black font-mono mt-1 opacity-70">
+                                            {product.price_pkr ? `Rs. ${product.price_pkr.toLocaleString()}` : 'Price TBD'}
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
-            )}
-        </div>
 
-        {products.length > 0 && (
-            <button 
-                onClick={clearAll}
-                className="flex items-center gap-2 text-[10px] font-black text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 uppercase tracking-[0.2em] transition-colors"
-            >
-                <X size={14} /> Clear All
-            </button>
-        )}
-      </header>
-
-      {/* Comparison Grid */}
-      <div className="overflow-x-auto pb-12 scrollbar-thin">
-        <div className="w-full" style={gridStyle}>
-            
-            {/* 1. Product Headers */}
-            {/* Label Placeholder */}
-            <div className="pt-24 md:pt-32 hidden md:block border-r border-transparent">
-                <div className="text-gray-300 dark:text-slate-700 text-[10px] font-black uppercase tracking-[0.3em] border-l-4 border-blue-600 dark:border-blue-400 pl-4 py-2 sticky left-0">
-                    COMPARISON <br /> MATRIX
-                </div>
-            </div>
-            {/* Mobile small spacer if needed */}
-            <div className="md:hidden"></div>
-
-            {products.map((product) => (
-                <div key={product.id} className="flex flex-col h-full bg-white dark:bg-[#121212] border-2 border-black dark:border-white/10 p-3 md:p-5 relative group shadow-[4px_4px_0px_0px_rgba(0,0,0,0.05)] hover:shadow-[4px_4px_0px_0px_rgba(37,99,235,1)] dark:hover:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-all mx-1">
+                {products.length > 0 && (
                     <button 
-                        onClick={() => removeFromCompare(product.id)}
-                        className="absolute top-1 right-1 w-6 h-6 md:w-8 md:h-8 bg-black dark:bg-[#0a0a0a] text-white flex items-center justify-center rounded-none hover:bg-red-600 transition-colors z-30 border-2 border-black dark:border-white/10"
+                        onClick={clearAll}
+                        className="p-4 bg-white dark:bg-[#121212] border-2 border-black dark:border-white/10 text-red-600 dark:text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.1)]"
+                        title="Clear All"
                     >
-                        <Trash2 size={14} />
+                        <X size={20} />
                     </button>
+                )}
+            </div>
+          </div>
+        </header>
 
-                    <div className="aspect-square bg-gray-50 dark:bg-[#0a0a0a] rounded-none mb-4 md:mb-6 flex items-center justify-center p-2 md:p-4 border border-gray-100 dark:border-white/5 font-black text-gray-200 dark:text-slate-800 text-[8px] md:text-xs uppercase text-center overflow-hidden">
-                        {product.image_url ? (
-                            <img src={product.image_url} alt="" className="w-full h-full object-contain dark:invert dark:brightness-110" />
-                        ) : (
-                            "NO_IMG"
-                        )}
-                    </div>
-                    
-                    <h3 className="font-black text-[9px] md:text-xs text-black dark:text-white uppercase tracking-tight leading-tight mb-4 h-10 md:h-12 line-clamp-3 italic">
-                        {product.name}
-                    </h3>
-                    
-                    <div className="mt-auto pt-3 border-t border-gray-100 dark:border-white/5">
-                         <a 
-                            href={product.url || product.prices?.[0]?.url || "#"} 
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 w-full py-2 bg-black dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-none text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] transition-colors whitespace-nowrap px-1 italic"
-                         >
-                            <span className="hidden sm:inline">Module Link</span>
-                         </a>
-                    </div>
-                </div>
-            ))}
+        {/* Comparison Grid */}
+        <div className="space-y-16">
             
-            {/* Clickable Placeholders */}
-            {[...Array(placeholdersNeeded)].map((_, i) => (
-                <button 
-                    key={`placeholder-${i}`} 
-                    onClick={openSelectionModal}
-                    className="bg-gray-50 dark:bg-[#121212]/50 rounded-none border-2 border-dashed border-gray-200 dark:border-white/10 flex items-center justify-center min-h-[250px] md:min-h-[350px] hover:border-black dark:hover:border-blue-600 hover:bg-white dark:hover:bg-[#121212] transition-all group mx-1"
-                >
-                                            <div className="text-center p-2 opacity-20 group-hover:opacity-100 transition-opacity">
-                                                <Plus size={40} className="mx-auto text-black dark:text-white mb-2 md:mb-4" />
-                                                <div className="text-[8px] md:text-[11px] font-black text-black dark:text-white uppercase tracking-[0.2em]">Insert Unit</div>
-                                            </div>
+            {/* Component Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+                {sortedProducts.map((product) => (
+                    <ComparisonCard 
+                        key={product.id}
+                        product={product}
+                        onRemove={removeFromCompare}
+                        onReplace={() => openSelectionModal(products.indexOf(product))}
+                        isBestValue={product.id === bestValueId}
+                        performanceScore={getMockScore(product)}
+                    />
+                ))}
+                
+                {/* Placeholders */}
+                {[...Array(productLimit - products.length)].map((_, i) => (
+                    <button 
+                        key={`placeholder-${i}`} 
+                        onClick={() => openSelectionModal()}
+                        className="group flex flex-col items-center justify-center h-full min-h-[420px] bg-gray-50 dark:bg-[#121212]/30 border-2 border-dashed border-black dark:border-white/10 hover:border-blue-600 dark:hover:border-blue-600 hover:bg-white dark:hover:bg-[#121212] transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.02)]"
+                    >
+                        <div className="w-16 h-16 bg-white dark:bg-black border-2 border-black dark:border-white/10 flex items-center justify-center text-black dark:text-white group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all mb-6">
+                            <Plus size={32} />
+                        </div>
+                        <div className="text-center">
+                            <div className="text-xs font-black text-gray-400 dark:text-slate-700 uppercase tracking-[0.3em] italic">Add Component</div>
+                            <div className="text-[9px] font-black text-gray-300 dark:text-slate-800 uppercase mt-2 italic">Product {products.length + i + 1}</div>
+                        </div>
+                    </button>
+                ))}
+            </div>
+
+            {/* Specifications Section */}
+            {products.length > 0 && (
+                <div className="space-y-8">
+                    <ComparisonControls 
+                        showOnlyDifferences={showOnlyDifferences}
+                        setShowOnlyDifferences={setShowOnlyDifferences}
+                        highlightBestValues={highlightBestValues}
+                        setHighlightBestValues={setHighlightBestValues}
+                        sortBy={sortBy}
+                        setSortBy={setSortBy}
+                    />
+
+                    <ComparisonTable 
+                        products={sortedProducts}
+                        showOnlyDifferences={showOnlyDifferences}
+                        highlightBestValues={highlightBestValues}
+                    />
                     
-                </button>
-            ))}
-        </div>
-
-        {/* Rows sections */}
-        <div className="mt-8 md:mt-12 space-y-8 md:space-y-12">
-            {/* 2. Top Level Rows (Price, etc) */}
-            {products.length > 0 && (
-                <div className="border-2 border-black dark:border-white/10 bg-white dark:bg-[#121212]" style={gridStyle}>
-                    {topLevelRows.map((row) => (
-                        <>
-                            <div key={row.label} className="p-3 md:p-5 bg-gray-50 dark:bg-[#0a0a0a] font-black text-[9px] md:text-[11px] text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] flex items-center border-r border-black dark:border-white/10 sticky left-0 z-20 italic">
-                                {row.label}
-                            </div>
-                            {products.map(product => (
-                                <div key={product.id} className={`p-3 md:p-5 text-sm md:text-lg font-black border-r border-black dark:border-white/10 last:border-0 ${row.color || 'text-black dark:text-white'} font-mono text-center md:text-left`}>
-                                    {row.format(product[row.key as keyof Component])}
-                                </div>
-                            ))}
-                            {/* Empty cells for placeholders to maintain grid */}
-                            {[...Array(placeholdersNeeded)].map((_, i) => (
-                                <div key={i} className="border-r border-black dark:border-white/10 last:border-0 bg-gray-50/20 dark:bg-[#0a0a0a]/20"></div>
-                            ))}
-                        </>
-                    ))}
-                </div>
-            )}
-
-            {/* 3. Specs Rows */}
-            {products.length > 0 && (
-                <div className="border-2 border-black dark:border-white/10 bg-white dark:bg-[#121212]" style={gridStyle}>
-                    {allSpecKeys.sort().map((key) => (
-                        <>
-                            <div key={key} className="p-3 md:p-5 bg-gray-50/50 dark:bg-[#0a0a0a]/50 font-black text-[9px] md:text-[10px] text-gray-400 dark:text-slate-500 uppercase tracking-[0.2em] flex items-center border-r border-black dark:border-white/10 sticky left-0 z-20 italic">
-                                {key.replace(/_/g, ' ')}
-                            </div>
-                            {products.map(product => (
-                                <div key={product.id} className="col-span-1 p-3 md:p-5 text-[10px] md:text-xs font-black text-black dark:text-slate-300 border-r border-gray-100 dark:border-white/5 last:border-0 uppercase tracking-tight leading-relaxed min-w-0 break-words text-center md:text-left transition-colors">
-                                    {String(product.specs?.[key] ?? '-')}
-                                </div>
-                            ))}
-                            {[...Array(placeholdersNeeded)].map((_, i) => (
-                                <div key={i} className="border-r border-gray-100 dark:border-white/5 last:border-0 bg-gray-50/10 dark:bg-[#0a0a0a]/10"></div>
-                            ))}
-                        </>
-                    ))}
+                    {/* Advisory Disclaimer */}
+                    <div className="p-8 bg-gray-50 dark:bg-[#121212] border-2 border-black dark:border-white/10 flex items-start gap-6 relative overflow-hidden">
+                        <div className="absolute right-0 top-0 h-full w-2 bg-blue-600"></div>
+                        <div className="bg-black text-white p-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(37,99,235,1)]">
+                            <Info size={24} />
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="text-sm font-black text-black dark:text-white uppercase tracking-widest italic flex items-center gap-3">
+                                <span className="text-blue-600">//</span> Important Note
+                            </h4>
+                            <p className="text-[11px] text-gray-600 dark:text-slate-400 font-bold uppercase tracking-tight leading-relaxed italic max-w-2xl">
+                                Compatibility Warning: Final hardware compatibility depends on specific BIOS versions and physical dimensions. 
+                                Please cross-reference all manufacturer specifications before purchasing. 
+                                <span className="text-blue-600 dark:text-blue-500 font-black ml-2 underline underline-offset-4 decoration-2">Verified Compatibility</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
       </div>
 
-      {/* Product Selection Modal */}
+      {/* Selection Modal Adaptation */}
       <Modal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        title={`Select ${selectedCategory.label} to Compare`}
+        title={`Select ${selectedCategory.label}`}
       >
         {isModalLoading ? (
-            <div className="text-center py-20 animate-pulse text-gray-300 dark:text-slate-700 font-black uppercase tracking-[0.3em] text-xs italic">
-                Accessing hardware archives...
+            <div className="flex flex-col items-center justify-center py-24">
+                <div className="w-16 h-16 border-4 border-black dark:border-blue-600 border-t-blue-600 animate-spin mb-8"></div>
+                <div className="text-black dark:text-white font-black uppercase tracking-[0.4em] text-xs italic animate-pulse">
+                    Loading Components...
+                </div>
             </div>
         ) : (
-            <div className="grid grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin dark:scrollbar-thumb-blue-600 dark:scrollbar-track-[#0a0a0a]">
+            <div className="grid grid-cols-1 gap-4 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin dark:scrollbar-thumb-blue-600 dark:scrollbar-track-black">
                 {modalProducts.length === 0 ? (
-                    <div className="text-center py-20 text-gray-300 dark:text-slate-700 font-black uppercase text-[10px] tracking-[0.3em] italic border-2 border-dashed border-gray-100 dark:border-white/5">
-                        Zero hardware profiles match current query.
+                    <div className="text-center py-24 border-2 border-dashed border-black dark:border-white/10">
+                        <span className="text-xs font-black text-gray-300 dark:text-slate-800 uppercase tracking-widest italic">No components found</span>
                     </div>
                 ) : (
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 gap-4">
                         {modalProducts.map((product) => {
                             const isAlreadyAdded = products.find(p => p.id === product.id);
                             return (
                                 <button
                                     key={product.id}
-                                    disabled={!!isAlreadyAdded}
-                                    onClick={() => {
-                                        addToCompare(product);
-                                        setIsModalOpen(false);
-                                    }}
-                                    className={`flex items-center gap-6 p-4 border-2 transition-all text-left group w-full ${
-                                        isAlreadyAdded 
-                                        ? 'bg-gray-50 dark:bg-[#0a0a0a] border-gray-100 dark:border-white/5 opacity-40 cursor-not-allowed' 
-                                        : 'bg-white dark:bg-[#121212] border-black dark:border-white/10 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] hover:shadow-[4px_4px_0px_0px_rgba(37,99,235,1)]'
+                                    disabled={!!isAlreadyAdded && replaceIndex === null}
+                                    onClick={() => addToCompare(product)}
+                                    className={`flex items-center gap-6 p-5 border-2 transition-all text-left group w-full ${
+                                        isAlreadyAdded && replaceIndex === null
+                                        ? 'bg-gray-50 dark:bg-black border-black/10 dark:border-white/5 opacity-40 cursor-not-allowed' 
+                                        : 'bg-white dark:bg-[#121212] border-black dark:border-white/10 hover:border-blue-600 dark:hover:border-blue-600 hover:shadow-[8px_8px_0px_0px_rgba(37,99,235,1)]'
                                     }`}
                                 >
-                                    <div className="w-16 h-16 bg-gray-100 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/5 flex items-center justify-center flex-shrink-0 font-black text-[8px] text-gray-300 dark:text-slate-700 uppercase italic">
+                                    <div className="w-20 h-20 bg-gray-50 dark:bg-black border-2 border-black dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                                         {product.image_url ? (
-                                            <img src={product.image_url} alt="" className="w-full h-full object-contain dark:invert dark:brightness-110" />
+                                            <img src={product.image_url} alt="" className="w-full h-full object-contain dark:invert" />
                                         ) : (
-                                            "NO IMG"
+                                            <div className="text-[8px] text-gray-300 font-black italic">NO IMAGE</div>
                                         )}
                                     </div>
                                     
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-black text-black dark:text-white uppercase tracking-tight mb-1 truncate italic group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                        <div className="text-sm font-black text-black dark:text-white uppercase tracking-tight mb-2 truncate group-hover:text-blue-600 transition-colors italic">
                                             {product.name}
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="text-[10px] font-black text-blue-600 dark:text-blue-400 font-mono italic bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5">
-                                                {product.price_pkr ? `Rs. ${product.price_pkr.toLocaleString()}` : 'PRICE_TBD'}
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            <div className="text-xs font-black text-blue-600 dark:text-blue-400 font-mono tracking-tighter">
+                                                {product.price_pkr ? `Rs. ${product.price_pkr.toLocaleString()}` : 'Price TBD'}
                                             </div>
-                                            <div className="text-[8px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">
-                                                {product.manufacturer} • {product.vendor || product.prices?.[0]?.vendor || 'AUTH_DEALER'}
+                                            <div className="text-[9px] font-black text-gray-400 dark:text-slate-600 uppercase tracking-widest bg-gray-50 dark:bg-black px-2 py-1 border border-black/5 dark:border-white/5 italic">
+                                                {product.manufacturer}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className={`w-10 h-10 flex items-center justify-center border-2 ${
-                                        isAlreadyAdded 
-                                        ? 'border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-[#0a0a0a]' 
-                                        : 'border-black dark:border-white/10 bg-white dark:bg-[#121212] group-hover:bg-black dark:group-hover:bg-blue-600 group-hover:text-white'
+                                    <div className={`w-14 h-14 flex items-center justify-center border-2 transition-all ${
+                                        isAlreadyAdded && replaceIndex === null
+                                        ? 'border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-black' 
+                                        : 'border-black dark:border-white/10 bg-white dark:bg-[#1a1a1a] group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white'
                                     }`}>
-                                        {isAlreadyAdded ? (
-                                            <Check size={16} className="text-gray-300 dark:text-slate-700" />
+                                        {isAlreadyAdded && replaceIndex === null ? (
+                                            <Check size={24} className="text-gray-300 dark:text-slate-800" />
                                         ) : (
-                                            <Plus size={16} className="dark:text-white" />
+                                            <Plus size={24} />
                                         )}
                                     </div>
                                 </button>
