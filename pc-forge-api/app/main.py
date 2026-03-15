@@ -24,6 +24,7 @@ from app.services.gallery_service import create_gallery_entry, fetch_gallery_bui
 from app.repositories.metrics_repo import get_system_metrics
 from app.services.auth_service import register_user, authenticate_user
 from app.repositories.admin_repo import get_incomplete_products, update_product_specs
+from app.services.ai_service import generate_smart_build
 
 import os
 
@@ -107,6 +108,16 @@ def fetch_all_component_filters():
 @app.get("/api/components/counts")
 def fetch_category_counts():
     return get_category_counts()
+
+@app.post("/api/ai/recommend")
+def ai_recommend(payload: dict):
+    # payload: { "prompt": "User input" }
+    prompt = payload.get("prompt")
+    if not prompt:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Prompt is required")
+    
+    return generate_smart_build(prompt)
 
 @app.get("/api/cpus")
 def get_cpus():

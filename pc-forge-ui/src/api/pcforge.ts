@@ -160,3 +160,12 @@ export async function updateProductSpecs(payload: { product_id: string; category
   });
   return res.json();
 }
+
+export async function fetchAIRecommendation(prompt: string): Promise<any> {
+  const res = await fetch(`${API}/api/ai/recommend`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
+  });
+  return res.json();
+}

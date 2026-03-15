@@ -2,14 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PriceSummary from "../components/PriceSummary";
 import { useBuild } from "../context/BuildContext";
-import { Plus, ArrowRight, RotateCcw, X, Loader2 } from "lucide-react";
-import { saveToGallery } from "../api/pcforge";
+import { Plus, ArrowRight, RotateCcw, X, Loader2, Sparkles } from "lucide-react";
+import { saveToGallery, fetchAIRecommendation, fetchComponents } from "../api/pcforge";
 
 export default function Builder() {
   const navigate = useNavigate();
-  const { build, removeComponent, clearBuild } = useBuild();
+  const { build, addComponent, removeComponent, clearBuild } = useBuild();
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiExplanation, setAiExplanation] = useState("");
+  
   const [formData, setFormData] = useState({
     title: "",
     description: ""
@@ -28,6 +32,44 @@ export default function Builder() {
 
   const userStr = localStorage.getItem('pcforge_user');
   const user = userStr ? JSON.parse(userStr) : null;
+
+  const handleAIBuild = async () => {
+    if (!aiPrompt.trim()) return;
+    setIsAiGenerating(true);
+    setAiExplanation("");
+    try {
+        const result = await fetchAIRecommendation(aiPrompt);
+        if (result.error) {
+            alert("AI Error: " + result.error);
+            return;
+        }
+
+        setAiExplanation(result.explanation);
+        
+        // Map recommendation to context. The AI returns { components: { category: id } }
+        // We need full component objects for addComponent.
+        // categories in DB: cpu, gpu, motherboard, psu, ram, ssd, case
+        const categories = ["cpu", "gpu", "motherboard", "psu", "ram", "storage", "case"];
+        
+        for (const cat of categories) {
+            const componentId = result.components[cat];
+            if (componentId) {
+                // Fetch full component details
+                const dbCat = cat; // Both 'storage' and others now match API
+                const components = await fetchComponents(dbCat);
+                const found = components.find(c => (c.id || c.product_id) === componentId);
+                if (found) {
+                    addComponent(found);
+                }
+            }
+        }
+    } catch (err) {
+        console.error("AI Build failed:", err);
+        alert("Failed to generate AI build. Please ensure the backend is running and DeepSeek key is valid.");
+    } finally {
+        setIsAiGenerating(false);
+    }
+  };
 
   const handleReset = () => {
     if (confirm("Are you sure you want to reset your current build?")) {
@@ -167,6 +209,48 @@ export default function Builder() {
   
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
               <div className="lg:col-span-8 space-y-4">
+                  {/* AI Builder Input */}
+                  <div className="mb-8 p-6 md:p-8 border-4 border-black dark:border-blue-600 bg-gray-50 dark:bg-slate-900/40 relative overflow-hidden group shadow-[8px_8px_0px_0px_rgba(37,99,235,1)]">
+                      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                          <Sparkles size={120} className="text-blue-600" />
+                      </div>
+                      <div className="relative z-10">
+                          <div className="flex items-center gap-3 mb-4">
+                              <Sparkles className="text-blue-600 animate-pulse" size={20} />
+                              <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter italic">AI Forge Architect</h2>
+                          </div>
+                          <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-6 max-w-xl">
+                              Describe your build (e.g., "A high-end 4K gaming PC with a budget of 300,000 PKR") and our architect will source the components for you.
+                          </p>
+                          <div className="flex flex-col md:flex-row gap-4">
+                              <textarea
+                                  value={aiPrompt}
+                                  onChange={(e) => setAiPrompt(e.target.value)}
+                                  placeholder="What kind of PC are we building today?"
+                                  className="flex-1 bg-white dark:bg-slate-950 border-2 border-black dark:border-white/10 p-4 text-sm font-bold uppercase tracking-tight focus:border-blue-600 outline-none resize-none min-h-[80px]"
+                              />
+                              <button
+                                  onClick={handleAIBuild}
+                                  disabled={isAiGenerating || !aiPrompt.trim()}
+                                  className="bg-black dark:bg-blue-600 text-white font-black px-8 py-4 uppercase tracking-widest text-[10px] hover:bg-blue-600 dark:hover:bg-blue-500 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed h-fit"
+                              >
+                                  {isAiGenerating ? (
+                                      <><Loader2 size={16} className="animate-spin" /> Architects Thinking...</>
+                                  ) : (
+                                      <><Sparkles size={16} /> Generate Build</>
+                                  )}
+                              </button>
+                          </div>
+                          {aiExplanation && (
+                              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600">
+                                  <p className="text-[11px] font-bold text-blue-800 dark:text-blue-300 italic leading-relaxed">
+                                      "{aiExplanation}"
+                                  </p>
+                              </div>
+                          )}
+                      </div>
+                  </div>
+
                   {slots.map((slot) => {
                       const isLocked = slot.required.some(req => !build[req]);
   
