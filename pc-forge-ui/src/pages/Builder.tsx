@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import PriceSummary from "../components/PriceSummary";
 import { useBuild } from "../context/BuildContext";
 import { Plus, ArrowRight, RotateCcw, X, Loader2, Sparkles } from "lucide-react";
@@ -7,12 +7,36 @@ import { saveToGallery, fetchAIRecommendation, fetchComponents } from "../api/pc
 
 export default function Builder() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { build, addComponent, removeComponent, clearBuild } = useBuild();
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiExplanation, setAiExplanation] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const promptParam = params.get("prompt");
+    if (promptParam) {
+      setAiPrompt(promptParam);
+      // We need to wait for the state to update or just use the param directly
+      // But handleAIBuild uses aiPrompt state. 
+      // To keep it simple, let's trigger it after a tiny delay or refactor.
+      // Actually, if we just call the logic directly here it's easier.
+    }
+  }, [location.search]);
+
+  // Trigger AI build when aiPrompt changes from URL (one-time)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const promptParam = params.get("prompt");
+    if (promptParam && aiPrompt === promptParam && !isAiGenerating && !aiExplanation) {
+      handleAIBuild();
+      // Remove the query param to avoid re-triggering on refresh
+      navigate("/builder", { replace: true });
+    }
+  }, [aiPrompt, location.search, navigate]);
   
   const [formData, setFormData] = useState({
     title: "",

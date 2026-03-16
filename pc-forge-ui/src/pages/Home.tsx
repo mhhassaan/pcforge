@@ -4,6 +4,7 @@ import HowItWorks from '../components/landing/HowItWorks';
 import Features from '../components/landing/Features';
 import CompatibilityShowcase from '../components/landing/CompatibilityShowcase';
 import Vendors from '../components/landing/Vendors';
+import StarterBuilds from '../components/landing/StarterBuilds';
 import CTA from '../components/landing/CTA';
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
       <Features />
       <CompatibilityShowcase />
       <Vendors />
+      <StarterBuilds />
       <CTA />
     </div>
   );

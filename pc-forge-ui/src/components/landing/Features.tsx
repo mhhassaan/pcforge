@@ -65,7 +65,7 @@ export default function Features() {
                 TECHNICAL{"\n"}SPECIFICATIONS
               </TextAnimate>
               <p className="text-base md:text-lg text-gray-600 dark:text-slate-400 max-w-lg leading-snug font-medium uppercase italic">
-                Our suite of tools is designed to prevent <Highlighter action="highlight" color="#2563EB" iterations={2}>assembly errors</Highlighter> before you spend a single Rupee.
+                Our suite of tools is designed to prevent assembly errors before you spend a single Rupee.
               </p>
             </div>
 

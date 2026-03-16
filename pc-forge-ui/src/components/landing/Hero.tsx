@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Cpu, Activity, ShieldCheck, Zap, Maximize, Layout } from 'lucide-react';
 import { MorphingText } from '../ui/MorphingText';
 import { DottedMap } from '../ui/DottedMap';
@@ -6,6 +7,16 @@ import { Highlighter } from '../ui/Highlighter';
 import { Safari } from '../ui/Safari';
 
 export default function Hero() {
+  const [aiInput, setAiInput] = useState("");
+  const navigate = useNavigate();
+
+  const handleAiSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (aiInput.trim()) {
+      navigate(`/builder?prompt=${encodeURIComponent(aiInput)}`);
+    }
+  };
+
   return (
     <section className="relative pt-20 pb-32 overflow-hidden bg-white dark:bg-[#0a0a0a] border-b-2 border-black dark:border-white/10 transition-colors duration-300">
       {/* Background Effect */}
@@ -56,20 +67,29 @@ export default function Hero() {
             <p className="text-lg md:text-xl text-gray-600 dark:text-slate-400 leading-tight font-medium max-w-lg uppercase">
               Compare prices from <Highlighter color="#2563EB" action="underline" iterations={2} strokeWidth={2}>Pakistani vendors</Highlighter> automatically. No guesswork. Just engineering.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-0 pt-4">
-              <Link 
-                to="/builder" 
-                className="bg-black dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-500 text-white font-black py-5 px-10 flex items-center justify-center gap-3 transition-colors uppercase tracking-widest text-xs border-2 border-black dark:border-blue-600"
-              >
-                Start Build <ArrowRight size={18} />
-              </Link>
-              <Link 
-                to="/components" 
-                className="bg-white dark:bg-slate-900 border-2 border-black dark:border-white/10 border-t-0 sm:border-t-2 sm:border-l-0 hover:bg-gray-50 dark:hover:bg-slate-800 text-black dark:text-white font-black py-5 px-10 flex items-center justify-center transition-colors uppercase tracking-widest text-xs"
-              >
-                Database
-              </Link>
+
+            {/* AI Prompt Box - Compact & Glowing */}
+            <div className="pt-4 max-w-2xl relative group">
+              {/* Glow Effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-none blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+              
+              <form onSubmit={handleAiSubmit} className="relative bg-white dark:bg-slate-900 border-2 border-black dark:border-white/10 flex flex-col sm:flex-row items-stretch p-1 gap-1 shadow-[0_0_20px_rgba(37,99,235,0.1)] group-hover:shadow-[0_0_30px_rgba(37,99,235,0.2)] transition-shadow">
+                <div className="flex-1 flex items-center px-4">
+                  <input 
+                    type="text" 
+                    value={aiInput}
+                    onChange={(e) => setAiInput(e.target.value)}
+                    placeholder="Build a 1080p gaming pc under 150k"
+                    className="w-full bg-transparent border-none focus:ring-0 p-4 text-xs font-black uppercase tracking-tight dark:text-white placeholder:text-gray-300 dark:placeholder:text-slate-700 outline-none"
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  className="bg-black dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-black py-4 px-8 uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-3"
+                >
+                  Forge <ArrowRight size={15} />
+                </button>
+              </form>
             </div>
           </div>
 

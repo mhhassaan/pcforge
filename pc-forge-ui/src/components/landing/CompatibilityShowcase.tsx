@@ -1,4 +1,4 @@
-import { CheckCircle2, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Maximize } from 'lucide-react';
 import { Highlighter } from '../ui/Highlighter';
 
 export default function CompatibilityShowcase() {
@@ -14,8 +14,8 @@ export default function CompatibilityShowcase() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-          {/* Error Example */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[1400px] mx-auto">
+          {/* Error Example 1 */}
           <div className="bg-gray-50 dark:bg-[#121212] border-2 border-black dark:border-white/10 p-8 rounded-none space-y-6 relative group transition-colors">
             <div className="absolute top-0 right-0 bg-red-600 text-white px-4 py-1 text-[10px] font-black uppercase tracking-widest font-mono">
                 FAIL STATE
@@ -43,6 +43,34 @@ export default function CompatibilityShowcase() {
             </div>
           </div>
 
+          {/* Error Example 2: GPU Clearance */}
+          <div className="bg-gray-50 dark:bg-[#121212] border-2 border-black dark:border-white/10 p-8 rounded-none space-y-6 relative group transition-colors">
+            <div className="absolute top-0 right-0 bg-red-600 text-white px-4 py-1 text-[10px] font-black uppercase tracking-widest font-mono">
+                FAIL STATE
+            </div>
+            
+            <div className="space-y-2">
+                <div className="flex items-center justify-between p-4 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/5">
+                    <span className="text-[10px] font-black uppercase text-gray-400 dark:text-slate-600 italic">GRAPHICS CARD</span>
+                    <span className="text-xs font-black uppercase dark:text-white">RTX 4090 STRIX <span className="text-blue-600 dark:text-blue-400 text-[9px] ml-2">(358MM)</span></span>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-red-50/50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30">
+                    <span className="text-[10px] font-black uppercase text-red-400 italic">CHASSIS</span>
+                    <span className="text-xs font-black uppercase text-red-600 dark:text-red-400 underline decoration-2 underline-offset-4">NZXT H5 FLOW <span className="text-[9px] ml-2">(360MM MAX)</span></span>
+                </div>
+            </div>
+
+            <div className="pt-4 flex gap-4 border-t border-red-100 dark:border-red-900/20">
+                <Maximize className="text-red-600 dark:text-red-500 flex-shrink-0" size={24} />
+                <div className="space-y-1">
+                    <h4 className="text-sm font-black text-black dark:text-white uppercase italic">SPATIAL CONFLICT</h4>
+                    <p className="text-[10px] text-gray-500 dark:text-slate-500 leading-relaxed font-bold uppercase tracking-tight">
+                        GPU length exceeds chassis clearance when front radiators are mounted.
+                    </p>
+                </div>
+            </div>
+          </div>
+
           {/* Success Example */}
           <div className="bg-gray-50 dark:bg-[#121212] border-2 border-black dark:border-blue-600 p-8 rounded-none space-y-6 relative group shadow-[12px_12px_0px_0px_rgba(37,99,235,1)] dark:shadow-[12px_12px_0px_0px_rgba(37,99,235,0.2)] transition-colors">
             <div className="absolute top-0 right-0 bg-blue-600 text-white px-4 py-1 text-[10px] font-black uppercase tracking-widest font-mono">
@@ -63,9 +91,9 @@ export default function CompatibilityShowcase() {
             <div className="pt-4 flex gap-4 border-t border-blue-100 dark:border-blue-900/20">
                 <CheckCircle2 className="text-blue-600 dark:text-blue-400 flex-shrink-0" size={24} />
                 <div className="space-y-1">
-                    <h4 className="text-sm font-black text-black dark:text-white uppercase italic">SOCKET MATCH </h4>
+                    <h4 className="text-sm font-black text-black dark:text-white uppercase italic">SYSTEM SYNCED</h4>
                     <p className="text-[10px] text-gray-500 dark:text-slate-500 leading-relaxed font-bold uppercase tracking-tight">
-                        Both components are compatible.
+                        Architecture parameters are fully aligned and compatible.
                     </p>
                 </div>
             </div>
