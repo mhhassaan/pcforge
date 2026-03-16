@@ -13,7 +13,6 @@ import {
   TrendingDown
 } from 'lucide-react';
 import { TextAnimate } from '../ui/TextAnimate';
-import { Highlighter } from '../ui/Highlighter';
 import CardSwap, { Card } from '../ui/CardSwap';
 
 const FEATURES = [
