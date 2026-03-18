@@ -111,6 +111,8 @@ export interface GalleryBuild {
   case_id: string;
   storage_id: string;
   user_name: string;
+  user_id: number | null;
+  session_id: string | null;
   total_price_pkr: number;
   is_public: boolean;
   share_id: string;

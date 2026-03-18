@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Camera, Plus, Monitor, Loader2, Hammer, Info } from 'lucide-react';
 import { fetchUserBuilds, fetchSessionBuilds, getSessionId } from '../api/pcforge';
 import type { GalleryBuild } from '../types/pcforge';
 
 export default function MyBuilds() {
-  const navigate = useNavigate();
   const [builds, setBuilds] = useState<GalleryBuild[]>([]);
   const [loading, setLoading] = useState(true);
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import PriceSummary from "../components/PriceSummary";
 import { useBuild } from "../context/BuildContext";
-import { Plus, ArrowRight, RotateCcw, X, Loader2, Sparkles, Store, Cpu as CpuIcon, ExternalLink } from "lucide-react";
+import { Plus, ArrowRight, RotateCcw, X, Loader2, Sparkles, Store, ExternalLink } from "lucide-react";
 import { saveToGallery, fetchAIRecommendation, fetchComponents, updateBuild, fetchGalleryBuild, fetchMerchantPrices, fetchComponentById } from "../api/pcforge";
 import { getVendorLogo } from "../lib/vendorLogos";
 import { STARTER_PRESETS } from "../lib/starterPresets";
