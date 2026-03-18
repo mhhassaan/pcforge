@@ -26,7 +26,8 @@ function App() {
             <Route path="guide" element={<Guide />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="gallery/:id" element={<GalleryBuildDetails />} />
-            <Route path="my-builds" element={<MyBuilds />} />
+            <Route path="build/:shareId" element={<GalleryBuildDetails />} />
+            <Route path="saved-builds" element={<MyBuilds />} />
             <Route path="login" element={<Auth />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/inventory" element={<AdminInventory />} />

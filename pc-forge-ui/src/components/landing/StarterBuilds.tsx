@@ -14,7 +14,7 @@ const STARTER_BUILDS = [
       { label: "RAM", name: "16GB DDR4 3200" },
     ],
     color: "bg-blue-600",
-    prompt: "Budget 1080p gaming PC under 120k with Ryzen 5600 and RX 6600"
+    preset: "budget"
   },
   {
     title: "1440p Gaming Build",
@@ -27,7 +27,7 @@ const STARTER_BUILDS = [
     ],
     color: "bg-black",
     highlight: true,
-    prompt: "1440p gaming PC under 220k with Ryzen 7600 and RTX 4060 Ti"
+    preset: "gaming"
   },
   {
     title: "Workstation Build",
@@ -39,7 +39,7 @@ const STARTER_BUILDS = [
       { label: "RAM", name: "64GB DDR5 6000" },
     ],
     color: "bg-blue-600",
-    prompt: "Professional workstation build under 350k with Ryzen 7900X"
+    preset: "workstation"
   }
 ];
 
@@ -90,7 +90,7 @@ export default function StarterBuilds() {
               </div>
 
               <ShinyButton 
-                onClick={() => navigate(`/builder?prompt=${encodeURIComponent(build.prompt)}`)}
+                onClick={() => navigate(`/builder?preset=${build.preset}`)}
                 className="w-full justify-center py-4 bg-black dark:bg-blue-600"
               >
                 LOAD IN BUILDER <ArrowRight size={14} className="ml-2" />

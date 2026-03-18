@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Lock, Mail, User, ShieldCheck, Loader2 } from 'lucide-react';
 import { AnimatedGridPattern } from '@/components/ui/AnimatedGridPattern';
+import { getSessionId } from '../api/pcforge';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function Auth() {
 
     const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
     const payload = isLogin 
-        ? { email: formData.email, password: formData.password }
+        ? { email: formData.email, password: formData.password, session_id: getSessionId() }
         : formData;
 
     try {

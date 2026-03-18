@@ -10,10 +10,29 @@ interface Props {
   items: SummaryItem[];
   total: number;
   onSave?: () => void;
+  onShare?: () => void;
   isComplete?: boolean;
+  title?: string;
+  description?: string;
+  onTitleChange?: (val: string) => void;
+  onDescriptionChange?: (val: string) => void;
+  isSaving?: boolean;
+  isSharing?: boolean;
 }
 
-export default function PriceSummary({ items, total, onSave, isComplete }: Props) {
+export default function PriceSummary({ 
+  items, 
+  total, 
+  onSave, 
+  onShare,
+  isComplete, 
+  title, 
+  description, 
+  onTitleChange, 
+  onDescriptionChange,
+  isSaving,
+  isSharing
+}: Props) {
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-900 border-2 border-black dark:border-white/10 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_0px_0px_rgba(37,99,235,0.1)] overflow-hidden transition-colors">
@@ -48,17 +67,58 @@ export default function PriceSummary({ items, total, onSave, isComplete }: Props
               <h3 className="text-[9px] md:text-[10px] text-gray-400 dark:text-slate-500 uppercase font-black tracking-widest mb-1 italic">Project Total</h3>
               <p className="text-3xl md:text-4xl font-black text-black dark:text-white font-mono tracking-tighter italic transition-colors">Rs. {total.toLocaleString()}</p>
           </div>
-          <button 
-            disabled={!isComplete}
-            onClick={onSave}
-            className={`font-black py-4 md:py-5 px-8 rounded-none uppercase tracking-widest text-[10px] transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.4)] active:shadow-none active:translate-x-1 active:translate-y-1 ${
-                isComplete 
-                ? 'bg-blue-600 dark:bg-blue-600 hover:bg-black dark:hover:bg-blue-500 text-white cursor-pointer' 
-                : 'bg-gray-100 dark:bg-slate-950 text-gray-300 dark:text-slate-800 cursor-not-allowed border-gray-200 dark:border-white/5'
-            }`}
-          >
-              {isComplete ? 'Publish to Gallery' : 'Steps Incomplete'}
-          </button>
+
+          {isComplete && (
+            <div className="space-y-4 py-4 border-t-2 border-black dark:border-white/5 mt-2">
+                <div className="space-y-1.5">
+                    <label className="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest italic">Build Title</label>
+                    <input 
+                        type="text"
+                        value={title}
+                        onChange={e => onTitleChange?.(e.target.value)}
+                        placeholder="e.g., The Silent Architect"
+                        className="w-full border-2 border-black dark:border-white/10 dark:bg-slate-950 p-3 text-[11px] font-black uppercase tracking-tight focus:bg-gray-50 dark:focus:bg-slate-800 dark:text-white outline-none transition-colors"
+                    />
+                </div>
+                
+                <div className="space-y-1.5">
+                    <label className="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest italic">Project Notes</label>
+                    <textarea 
+                        rows={2}
+                        value={description}
+                        onChange={e => onDescriptionChange?.(e.target.value)}
+                        placeholder="Describe your configuration choices..."
+                        className="w-full border-2 border-black dark:border-white/10 dark:bg-slate-950 p-3 text-[11px] font-black uppercase tracking-tight focus:bg-gray-50 dark:focus:bg-slate-800 dark:text-white outline-none resize-none transition-colors"
+                    />
+                </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button 
+                disabled={!isComplete || isSaving || isSharing}
+                onClick={onSave}
+                className={`font-black py-4 md:py-5 px-4 rounded-none uppercase tracking-widest text-[10px] transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.4)] active:shadow-none active:translate-x-1 active:translate-y-1 ${
+                    isComplete 
+                    ? 'bg-blue-600 dark:bg-blue-600 hover:bg-black dark:hover:bg-blue-500 text-white cursor-pointer' 
+                    : 'bg-gray-100 dark:bg-slate-950 text-gray-300 dark:text-slate-800 cursor-not-allowed border-gray-200 dark:border-white/5'
+                }`}
+            >
+                {isSaving ? 'PUBLISHING...' : (isComplete ? 'SAVE BUILD' : 'Steps Incomplete')}
+            </button>
+
+            <button 
+                disabled={!isComplete || isSaving || isSharing}
+                onClick={onShare}
+                className={`font-black py-4 md:py-5 px-4 rounded-none uppercase tracking-widest text-[10px] transition-all border-2 border-black dark:border-blue-600 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(37,99,235,0.4)] active:shadow-none active:translate-x-1 active:translate-y-1 ${
+                    isComplete 
+                    ? 'bg-white dark:bg-slate-900 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 cursor-pointer' 
+                    : 'bg-gray-100 dark:bg-slate-950 text-gray-300 dark:text-slate-800 cursor-not-allowed border-gray-200 dark:border-white/5'
+                }`}
+            >
+                {isSharing ? 'GENERATING...' : 'SAVE & SHARE'}
+            </button>
+          </div>
       </div>
     </div>
   );

@@ -112,6 +112,8 @@ export interface GalleryBuild {
   storage_id: string;
   user_name: string;
   total_price_pkr: number;
+  is_public: boolean;
+  share_id: string;
   created_at: string;
   cpu_name?: string;
   gpu_name?: string;
@@ -134,5 +136,24 @@ export interface GalleryBuildCreate {
   storage_id: string;
   user_name?: string;
   user_id?: number;
+  session_id?: string;
+  is_public?: boolean;
+  share_id?: string;
   total_price_pkr?: number;
+  version_label?: string;
+}
+
+export interface BuildVersion {
+  version_id: string;
+  build_id: number;
+  version_number: number;
+  label: string | null;
+  created_at: string;
+}
+
+export interface BuildVersionDiff {
+  [component: string]: {
+    old: string | null;
+    new: string | null;
+  };
 }

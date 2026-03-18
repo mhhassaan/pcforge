@@ -215,3 +215,78 @@ def get_components_by_category(category: str, search_query: str = None, filters:
     cur.close()
     conn.close()
     return results
+
+def get_component_details(product_id: str):
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    
+    # First, get the basic product info to know the category
+    cur.execute("SELECT product_id, product_name, manufacturer, category, image_url FROM products WHERE product_id = %s", (product_id,))
+    product = cur.fetchone()
+    if not product:
+        cur.close()
+        conn.close()
+        return None
+        
+    category = product['category']
+    # Map category to its specs table
+    table_map = {
+        "cpu": "cpu_specs",
+        "gpu": "gpu_specs",
+        "motherboard": "motherboard_specs",
+        "psu": "psu_specs",
+        "ram": "ram_specs",
+        "ssd": "storage_specs",
+        "case": "case_specs"
+    }
+    
+    specs_table = table_map.get(category)
+    
+    sql = f"""
+    SELECT 
+        p.product_id,
+        p.product_name,
+        p.manufacturer,
+        p.category,
+        p.image_url,
+        MIN(v.price) as price_pkr,
+        json_agg(
+            json_build_object(
+                'vendor', v.vendor,
+                'price', v.price,
+                'url', v.url
+            ) ORDER BY v.price ASC
+        ) FILTER (WHERE v.price IS NOT NULL) as all_prices,
+        s.*
+    FROM products p
+    LEFT JOIN {specs_table} s ON p.product_id = s.product_id
+    LEFT JOIN vendor_prices v ON p.product_id = v.product_id
+    WHERE p.product_id = %s
+    GROUP BY p.product_id, s.product_id, p.image_url
+    """
+    
+    cur.execute(sql, (product_id,))
+    row = cur.fetchone()
+    if not row:
+        cur.close()
+        conn.close()
+        return None
+        
+    row_dict = dict(row)
+    base_fields = ["product_id", "product_name", "manufacturer", "category", "price_pkr", "all_prices", "image_url"]
+    spec_data = {k: v for k, v in row_dict.items() if k not in base_fields}
+    
+    result = {
+        "id": row["product_id"],
+        "name": row["product_name"],
+        "manufacturer": row["manufacturer"],
+        "category": row["category"],
+        "price_pkr": row["price_pkr"],
+        "prices": row["all_prices"] or [],
+        "image_url": row["image_url"], 
+        "specs": spec_data
+    }
+    
+    cur.close()
+    conn.close()
+    return result

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Camera, Plus, Monitor, Loader2, Hammer } from 'lucide-react';
-import { fetchUserBuilds } from '../api/pcforge';
+import { Camera, Plus, Monitor, Loader2, Hammer, Info } from 'lucide-react';
+import { fetchUserBuilds, fetchSessionBuilds, getSessionId } from '../api/pcforge';
 import type { GalleryBuild } from '../types/pcforge';
 
 export default function MyBuilds() {
@@ -13,14 +13,14 @@ export default function MyBuilds() {
   const user = userStr ? JSON.parse(userStr) : null;
 
   useEffect(() => {
-    if (!user) {
-        navigate('/login');
-        return;
-    }
-
     async function loadMyBuilds() {
       try {
-        const data = await fetchUserBuilds(user.id);
+        let data: GalleryBuild[] = [];
+        if (user) {
+          data = await fetchUserBuilds(user.id);
+        } else {
+          data = await fetchSessionBuilds(getSessionId());
+        }
         setBuilds(data);
       } catch (err) {
         console.error("Failed to fetch my builds:", err);
@@ -29,18 +29,32 @@ export default function MyBuilds() {
       }
     }
     loadMyBuilds();
-  }, [user?.id, navigate]);
-
-  if (!user) return null;
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-black dark:text-white p-3 md:p-8 font-sans overflow-x-hidden transition-colors duration-300">
       <div className="max-w-[1400px] mx-auto">
+        {!user && (
+          <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-600 flex items-center justify-between gap-4 shadow-[8px_8px_0px_0px_rgba(37,99,235,1)]">
+            <div className="flex items-center gap-3">
+              <Info className="text-blue-600 dark:text-blue-400" size={20} />
+              <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-blue-900 dark:text-blue-200">
+                Save your builds permanently. Sign up to store and manage your PC builds across devices.
+              </p>
+            </div>
+            <Link 
+              to="/login"
+              className="bg-black dark:bg-blue-600 text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-colors"
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
         <header className="mb-12 md:mb-20 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
             <div className="flex-1 min-w-0">
-                <h1 className="text-4xl md:text-6xl font-black text-black dark:text-white uppercase tracking-tighter mb-4 italic leading-none break-words">MY ARCHIVES</h1>
+                <h1 className="text-4xl md:text-6xl font-black text-black dark:text-white uppercase tracking-tighter mb-4 italic leading-none break-words">SAVED BUILDS</h1>
                 <div className="h-2 w-32 bg-blue-600 mb-6"></div>
-                <p className="text-gray-400 dark:text-slate-500 font-bold uppercase tracking-[0.3em] text-[9px] md:text-[10px]">Your personal collection of hardware configurations.</p>
+                <p className="text-gray-400 dark:text-slate-500 font-bold uppercase tracking-[0.3em] text-[9px] md:text-[10px]">Your collection of hardware configurations (Session + User).</p>
             </div>
             <Link 
                 to="/builder"
@@ -95,7 +109,7 @@ export default function MyBuilds() {
                           <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/5 flex justify-between items-center">
                               <span className="text-[10px] font-black text-gray-300 dark:text-slate-700 uppercase tracking-widest italic">STATUS: ARCHIVED</span>
                               <Link 
-                                to={`/gallery/${build.id}`}
+                                to={`/build/${build.share_id}`}
                                 className="text-[10px] font-black text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 uppercase tracking-widest underline decoration-2 underline-offset-4 transition-colors"
                               >
                                   Details

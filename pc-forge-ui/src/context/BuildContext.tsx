@@ -7,6 +7,9 @@ interface BuildState {
 
 interface BuildContextType {
   build: BuildState;
+  setBuild: (build: BuildState) => void;
+  editingBuildId: number | null;
+  setEditingBuildId: (id: number | null) => void;
   addComponent: (component: Component) => void;
   removeComponent: (category: string) => void;
   clearBuild: () => void;
@@ -19,6 +22,7 @@ const BuildContext = createContext<BuildContextType | undefined>(undefined);
 
 export function BuildProvider({ children }: { children: ReactNode }) {
   const [build, setBuild] = useState<BuildState>({});
+  const [editingBuildId, setEditingBuildId] = useState<number | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -32,6 +36,10 @@ export function BuildProvider({ children }: { children: ReactNode }) {
         console.error("Failed to parse saved build", e);
       }
     }
+    const savedId = localStorage.getItem('pcforge_editing_id');
+    if (savedId) {
+      setEditingBuildId(parseInt(savedId));
+    }
     setIsInitialized(true);
   }, []);
 
@@ -39,8 +47,13 @@ export function BuildProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem('pcforge_build', JSON.stringify(build));
+      if (editingBuildId) {
+        localStorage.setItem('pcforge_editing_id', editingBuildId.toString());
+      } else {
+        localStorage.removeItem('pcforge_editing_id');
+      }
     }
-  }, [build, isInitialized]);
+  }, [build, editingBuildId, isInitialized]);
 
   const addComponent = (component: Component) => {
     const rawCategory = component.category.toLowerCase();
@@ -75,7 +88,9 @@ export function BuildProvider({ children }: { children: ReactNode }) {
 
   const clearBuild = () => {
     setBuild({});
+    setEditingBuildId(null);
     localStorage.removeItem('pcforge_build');
+    localStorage.removeItem('pcforge_editing_id');
   };
 
   const toggleDrawer = (open?: boolean) => {
@@ -89,6 +104,9 @@ export function BuildProvider({ children }: { children: ReactNode }) {
   return (
     <BuildContext.Provider value={{ 
       build, 
+      setBuild,
+      editingBuildId,
+      setEditingBuildId,
       addComponent, 
       removeComponent, 
       clearBuild, 

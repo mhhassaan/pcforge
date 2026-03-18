@@ -1,37 +1,63 @@
 # PC Forge
 
-PC Forge is a comprehensive full-stack application designed to simplify the PC building process. It features a robust compatibility engine that validates component selections in real-time, ensuring that every build is technically sound before a single part is purchased.
+PC Forge is a sophisticated full-stack platform designed to revolutionize the PC building experience. Beyond a simple parts list, it features a **Real-time Compatibility Engine** that validates every electrical and physical constraint, an **AI-powered build assistant**, and a **multi-vendor price optimization** system.
+
+Whether you're a first-time builder or a hardware enthusiast, PC Forge ensures your build is technically sound and economically optimized before you commit to a single purchase.
+
+![Landing Page](./pc-forge-ui/screenshots/PCForge%20Build%20Your%20Dream%20PC.png)
 
 ## Key Features
 
-- **Real-time Compatibility Validation:** Checks socket types, form factors, power requirements, and physical dimensions.
-- **Layered Architecture:** Follows a strict separation of concerns with API, Service, and Repository layers.
-- **Dynamic Component Filtering:** Automatically filters compatible parts based on your current selections.
-- **Price Summarization:** Aggregates current pricing for your entire build.
-- **Modern UI/UX:** Interactive builder interface with assembly flows and component details.
+### Intelligent Compatibility Engine
+- **Socket & Chipset Validation:** Ensures CPU and Motherboard harmony (e.g., LGA1700, AM5).
+- **Physical Clearance Checks:** Validates GPU length vs. Case clearance and RAM height vs. CPU Cooler.
+- **Power Budgeting:** Automatically calculates Total TDP and recommends appropriate PSU wattage with safety margins.
+- **Form Factor Verification:** Matches Motherboards (ATX, mATX, ITX) with compatible Chassis and PSUs.
 
-## Project Structure
+### AI Build Assistant
+- **Prompt-to-Build:** Describe your needs (e.g., "4K video editing for $2000") and receive a curated, compatible component list instantly.
+- **Context-Aware Suggestions:** Recommends alternative parts based on current selections and budget.
 
-The repository is organized into two main components:
+### Market & Price Optimization
+- **Multi-Vendor Aggregation:** Tracks prices across multiple merchants to find the absolute lowest cost for each component.
+- **One-Click Merchant Routing:** Direct links to purchase components from the cheapest verified vendors.
 
-- **`pc-forge-api/`**: The FastAPI backend providing the compatibility logic and database integration.
-- **`pc-forge-ui/`**: A high-performance React frontend built with Vite and Tailwind CSS.
+### Build Versioning & Timeline
+- **Revision History:** Save multiple versions of a single build and track changes over time.
+- **Diff Tool:** Compare different versions of your build to see how specifications and prices have evolved.
+
+### Community & Sharing
+- **Gallery Showcase:** Share your completed or planned builds with the community.
+- **Portable Share Links:** Generate unique, persistent IDs for sharing builds on forums or social media.
+- **Anonymous Session Migration:** Start building as a guest and seamlessly transfer your work to a registered account.
+
+### Professional Admin Tools
+- **Data Integrity Dashboard:** Real-time metrics on product coverage and missing specifications.
+- **Dynamic Spec Management:** Tools for administrators to update hardware specifications and maintain data accuracy.
+
+## Architecture
+
+PC Forge follows a **Layered Architecture** to ensure maintainability, scalability, and testability.
+
+1.  **API Layer (`app/main.py`):** FastAPI-based RESTful interface with strict Pydantic validation.
+2.  **Service Layer (`app/services/`):** Orchestrates complex business logic, including the compatibility engine and AI integration.
+3.  **Repository Layer (`app/repositories/`):** High-performance Data Access Layer (DAL) using raw SQL for optimized PostgreSQL queries.
+4.  **Database:** PostgreSQL (Hosted on **Neon**) with a relational schema optimized for many-to-many hardware relationships.
 
 ## Tech Stack
 
 ### Backend
-- **Framework:** [FastAPI](https://fastapi.tiangolo.com/)
-- **Language:** Python 3.9+
-- **Database:** PostgreSQL (Hosted on [Neon](https://neon.tech/))
-- **Validation:** [Pydantic](https://docs.pydantic.dev/)
-- **Driver:** `psycopg2-binary`
+- **Framework:** FastAPI (Python 3.9+)
+- **Database:** PostgreSQL (Neon)
+- **AI Integration:** LLM-powered recommendations
+- **Deployment:** Vercel (Python Runtime)
 
-### Frontend (Vite)
-- **Framework:** [React 19](https://react.dev/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Animations:** [Framer Motion](https://www.framer.com/motion/)
-- **Icons:** [Lucide React](https://lucide.dev/)
-- **UI Components:** [Radix UI](https://www.radix-ui.com/)
+### Frontend
+- **Framework:** React 19 (Vite)
+- **Routing:** React Router 7
+- **Styling:** Tailwind CSS + Radix UI
+- **Animations:** Framer Motion + GSAP
+- **State/Data:** Real-time API integration with persistent local sessions
 
 ## Getting Started
 
@@ -42,48 +68,34 @@ The repository is organized into two main components:
 
 ### 1. Backend Setup (`pc-forge-api`)
 
-1. Navigate to the backend directory:
-   ```bash
-   cd pc-forge-api
-   ```
-2. Create a virtual environment and install dependencies:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-3. Configure environment variables:
-   Create a `.env` file in `pc-forge-api/` with:
-   ```env
-   DATABASE_URL=your_postgresql_connection_string
-   ```
-4. Run the development server:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   API Docs: `http://localhost:8000/docs`
+```bash
+cd pc-forge-api
+python -m venv venv
+# On Windows: venv\Scripts\activate | On Unix: source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Create a `.env` file in `pc-forge-api/`:
+```env
+DATABASE_URL=your_postgresql_connection_string
+ALLOWED_ORIGINS=http://localhost:5173
+```
+
+Run the API:
+```bash
+uvicorn app.main:app --reload
+```
 
 ### 2. Frontend Setup (`pc-forge-ui`)
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd pc-forge-ui
-   ```
-2. Install dependencies and run development server:
-   ```bash
-   npm install
-   npm run dev
-   ```
+```bash
+cd pc-forge-ui
+npm install
+npm run dev
+```
 
-## Architecture Overview
-
-The project adheres to a clean, layered architecture:
-
-1. **API Layer (`app/main.py`)**: Handles HTTP requests/responses and Pydantic validation.
-2. **Service Layer (`app/services/`)**: Orchestrates business logic and applies compatibility rules.
-3. **Repository Layer (`app/repositories/`)**: Manages raw SQL queries for optimized data retrieval.
-4. **Database**: relational schema optimized for many-to-many component relationships.
+The application will be available at `http://localhost:5173`.
 
 ---
 
-*Developed for PC Builders & Hobbyists.*
+*Engineered for builders, by builders.*

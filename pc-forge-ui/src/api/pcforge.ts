@@ -1,6 +1,16 @@
+// PC Forge API client - v1.0.3
 import type { CPU, Motherboard, RAM, GPU, Case, PSU, Storage, PriceResponse, Component, GalleryBuild, GalleryBuildCreate } from "../types/pcforge";
 
 const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+export function getSessionId(): string {
+  let sessionId = localStorage.getItem("session_id");
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("session_id", sessionId);
+  }
+  return sessionId;
+}
 
 export async function fetchGallery(): Promise<GalleryBuild[]> {
   const res = await fetch(`${API}/api/gallery`);
@@ -12,16 +22,59 @@ export async function fetchUserBuilds(userId: number): Promise<GalleryBuild[]> {
   return res.json();
 }
 
+export async function fetchSessionBuilds(sessionId: string): Promise<GalleryBuild[]> {
+  const res = await fetch(`${API}/api/gallery/session/${sessionId}`);
+  return res.json();
+}
+
+export async function fetchBuildTimeline(buildId: number): Promise<any[]> {
+  const res = await fetch(`${API}/api/build/${buildId}/timeline`);
+  return res.json();
+}
+
+export async function fetchVersionDiff(buildId: number, v1: number, v2: number): Promise<any> {
+  const res = await fetch(`${API}/api/build/${buildId}/diff?v1=${v1}&v2=${v2}`);
+  return res.json();
+}
+
 export async function fetchGalleryBuild(id: number): Promise<GalleryBuild> {
   const res = await fetch(`${API}/api/gallery/${id}`);
   return res.json();
 }
 
-export async function saveToGallery(build: GalleryBuildCreate): Promise<{ id: number; message: string }> {
+export async function getSharedBuild(shareId: string): Promise<GalleryBuild> {
+  const res = await fetch(`${API}/api/gallery/share/${shareId}`);
+  return res.json();
+}
+
+export async function saveToGallery(build: GalleryBuildCreate): Promise<{ id: number; share_id: string; message: string }> {
+  const buildWithSession = { ...build, session_id: getSessionId() };
   const res = await fetch(`${API}/api/gallery`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(buildWithSession),
+  });
+  return res.json();
+}
+
+export async function updateBuild(buildId: number, build: GalleryBuildCreate): Promise<{ message: string }> {
+  const res = await fetch(`${API}/api/gallery/${buildId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(build),
+  });
+  return res.json();
+}
+
+export async function fetchComponentById(productId: string): Promise<Component> {
+  const res = await fetch(`${API}/api/components/${productId}`);
+  return res.json();
+}
+
+export async function deleteBuild(buildId: number): Promise<{ message: string }> {
+
+  const res = await fetch(`${API}/api/gallery/${buildId}`, {
+    method: "DELETE",
   });
   return res.json();
 }
@@ -134,8 +187,16 @@ export async function fetchPrice(productIds: string[]): Promise<PriceResponse> {
   return res.json();
 }
 
+export async function fetchMerchantPrices(productIds: string[]): Promise<any[]> {
+  const res = await fetch(`${API}/api/build/merchant-prices`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ product_ids: productIds }),
+  });
+  return res.json();
+}
+
 export async function fetchAdminMetrics(): Promise<any> {
-  // Fetch system metrics for admin dashboard
   const res = await fetch(`${API}/api/admin/metrics`);
   return res.json();
 }

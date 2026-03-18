@@ -1,6 +1,7 @@
 import type { Component } from '../types/pcforge';
 import { useBuild } from '../context/BuildContext';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Store } from 'lucide-react';
+import { getVendorLogo } from '../lib/vendorLogos';
 
 interface Props {
   component: Component | null;
@@ -71,9 +72,18 @@ export default function ComponentDetails({ component, onClose, onAddOverride }: 
             <div className="space-y-2">
                 {(component.prices || []).map((listing, idx) => (
                     <div key={idx} className="bg-white dark:bg-slate-900 border border-black dark:border-white/10 p-3 flex items-center justify-between shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(37,99,235,0.2)]">
-                        <div>
-                            <div className="font-black text-[10px] text-black dark:text-white uppercase tracking-tight">{listing.vendor}</div>
-                            <div className="text-[8px] font-black text-blue-600 dark:text-blue-400 uppercase mt-0.5">Verified Stock</div>
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-white dark:bg-slate-800 p-1 border border-gray-100 dark:border-white/5 flex items-center justify-center">
+                                {getVendorLogo(listing.vendor) ? (
+                                    <img src={getVendorLogo(listing.vendor)!} alt={listing.vendor} className="w-full h-full object-contain" />
+                                ) : (
+                                    <Store size={14} className="text-gray-400" />
+                                )}
+                            </div>
+                            <div>
+                                <div className="font-black text-[10px] text-black dark:text-white uppercase tracking-tight">{listing.vendor}</div>
+                                <div className="text-[8px] font-black text-blue-600 dark:text-blue-400 uppercase mt-0.5">Verified Stock</div>
+                            </div>
                         </div>
                         <div className="text-right">
                             <div className="text-xs font-black text-black dark:text-white font-mono">Rs. {listing.price.toLocaleString()}</div>

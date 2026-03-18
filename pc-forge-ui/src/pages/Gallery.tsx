@@ -84,7 +84,7 @@ export default function Gallery() {
                           <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/5 flex justify-between items-center">
                               <span className="text-[10px] font-black text-gray-300 dark:text-slate-700 uppercase tracking-widest italic">STATUS: COMPLETED</span>
                               <Link 
-                                to={`/gallery/${build.id}`}
+                                to={`/build/${build.share_id}`}
                                 className="text-[10px] font-black text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 uppercase tracking-widest underline decoration-2 underline-offset-4 transition-colors"
                               >
                                   View Details

@@ -140,7 +140,7 @@ export default function Navbar() {
     { name: 'Compare', href: '/compare' },
     { name: 'Guide', href: '/guide' },
     { name: 'Gallery', href: '/gallery' },
-    ...(user ? [{ name: 'Archives', href: '/my-builds' }] : []),
+    { name: 'Saved Builds', href: '/saved-builds' },
     ...(isAdmin ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
 
