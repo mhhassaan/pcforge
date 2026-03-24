@@ -77,7 +77,7 @@ export default function PriceSummary({
                         value={title}
                         onChange={e => onTitleChange?.(e.target.value)}
                         placeholder="e.g., The Silent Architect"
-                        className="w-full border-2 border-black dark:border-white/10 dark:bg-slate-950 p-3 text-[11px] font-black uppercase tracking-tight focus:bg-gray-50 dark:focus:bg-slate-800 dark:text-white outline-none transition-colors"
+                        className="w-full border-2 border-black dark:border-white/10 dark:bg-slate-950 p-3 text-[11px] font-black tracking-tight focus:bg-gray-50 dark:focus:bg-slate-800 dark:text-white outline-none transition-colors"
                     />
                 </div>
                 
@@ -88,7 +88,7 @@ export default function PriceSummary({
                         value={description}
                         onChange={e => onDescriptionChange?.(e.target.value)}
                         placeholder="Describe your configuration choices..."
-                        className="w-full border-2 border-black dark:border-white/10 dark:bg-slate-950 p-3 text-[11px] font-black uppercase tracking-tight focus:bg-gray-50 dark:focus:bg-slate-800 dark:text-white outline-none resize-none transition-colors"
+                        className="w-full border-2 border-black dark:border-white/10 dark:bg-slate-950 p-3 text-[11px] font-black tracking-tight focus:bg-gray-50 dark:focus:bg-slate-800 dark:text-white outline-none resize-none transition-colors"
                     />
                 </div>
             </div>

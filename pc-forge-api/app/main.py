@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from app.repositories.build_repo import validate_build
 from app.services.build_validator import build_validation_result
 from app.repositories.ram_repo import get_compatible_ram
@@ -23,13 +24,29 @@ from app.schemas import BuildRequest, BuildValidationResponse, PriceRequest, Gal
 from app.services.gallery_service import create_gallery_entry, modify_gallery_entry, fetch_gallery_builds, fetch_build_details, fetch_user_builds, fetch_session_builds, transfer_anonymous_builds, fetch_build_by_share_id, remove_gallery_entry
 from app.services.version_service import save_build_version, fetch_build_timeline, fetch_version_diff
 from app.repositories.metrics_repo import get_system_metrics
-from app.services.auth_service import register_user, authenticate_user
+from app.services.auth_service import register_user, authenticate_user, verify_token
 from app.repositories.admin_repo import get_incomplete_products, update_product_specs
 from app.services.ai_service import generate_smart_build
 
 import os
 
 app = FastAPI(title="PC Forge API")
+
+# Auth Configuration
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login", auto_error=False)
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication token missing")
+    payload = verify_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return payload
+
+async def get_current_admin(current_user: dict = Depends(get_current_user)):
+    if not current_user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return current_user
 
 # Allow origins from environment variable or default to localhost
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
@@ -46,28 +63,24 @@ app.add_middleware(
 def register(user: UserCreate):
     new_user = register_user(user.dict())
     if not new_user:
-        from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="Email already registered")
     return {"message": "User registered successfully", "user": new_user}
 
 @app.post("/api/auth/login")
 def login(user: UserLogin):
-    authenticated_user = authenticate_user(user.email, user.password)
-    if not authenticated_user:
-        from fastapi import HTTPException
+    auth_data = authenticate_user(user.email, user.password)
+    if not auth_data:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Migrate anonymous builds if session_id is provided
     if user.session_id:
-        transfer_anonymous_builds(user.session_id, authenticated_user['id'])
+        transfer_anonymous_builds(user.session_id, auth_data['user']['id'])
         
     return {
         "message": "Login successful", 
-        "user": {
-            "id": authenticated_user['id'],
-            "username": authenticated_user['username'], 
-            "email": authenticated_user['email']
-        }
+        "user": auth_data['user'],
+        "access_token": auth_data['access_token'],
+        "token_type": "bearer"
     }
 
 @app.get("/api/gallery")
@@ -160,24 +173,9 @@ def get_timeline(build_id: int):
 def get_version_diff(build_id: int, v1: int, v2: int):
     return fetch_version_diff(build_id, v1, v2)
 
-@app.get("/api/components/{product_id}")
-def fetch_component_by_id(product_id: str):
-    from app.repositories.component_repo import get_component_details
-    comp = get_component_details(product_id)
-    if not comp:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="Component not found")
-    return comp
-
-@app.get("/api/components")
-def fetch_components(request: Request, category: str, q: str = None, sort_by: str = None, order: str = "asc"):
-    # Extract arbitrary filters from query params, excluding 'category', 'q', 'sort_by', and 'order'
-    filters = {}
-    for key, value in request.query_params.items():
-        if key not in ["category", "q", "sort_by", "order"]:
-            filters[key] = value.split(",")
-    
-    return get_components_by_category(category, q, filters, sort_by, order)
+@app.get("/api/components/counts")
+def fetch_category_counts():
+    return get_category_counts()
 
 @app.get("/api/components/filters")
 def fetch_component_filters(category: str):
@@ -189,9 +187,14 @@ def fetch_all_component_filters():
     data = get_all_filters()
     return data
 
-@app.get("/api/components/counts")
-def fetch_category_counts():
-    return get_category_counts()
+@app.get("/api/components/{product_id}")
+def fetch_component_by_id(product_id: str):
+    from app.repositories.component_repo import get_component_details
+    comp = get_component_details(product_id)
+    if not comp:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Component not found")
+    return comp
 
 @app.post("/api/ai/recommend")
 def ai_recommend(payload: dict):
@@ -336,24 +339,28 @@ def merchant_prices(req: PriceRequest):
 
 
 @app.get("/api/admin/metrics")
-def admin_metrics():
+def admin_metrics(current_admin: dict = Depends(get_current_admin)):
     return get_system_metrics()
 
+@app.get("/api/admin/vendor-audit")
+def admin_vendor_audit(current_admin: dict = Depends(get_current_admin)):
+    from app.repositories.metrics_repo import get_vendor_audit_metrics
+    return get_vendor_audit_metrics()
+
 @app.get("/api/admin/incomplete-products")
-def fetch_incomplete(category: str = None):
+def fetch_incomplete(category: str = None, current_admin: dict = Depends(get_current_admin)):
     return get_incomplete_products(category)
 
 @app.post("/api/admin/update-specs")
-def update_specs(payload: dict):
+def update_specs(payload: dict, current_admin: dict = Depends(get_current_admin)):
     # payload: { product_id, category, specs: { ... } }
     success = update_product_specs(payload['product_id'], payload['category'], payload['specs'])
     if not success:
-        from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="Failed to update specs")
     return {"message": "Specs updated successfully"}
 
 @app.get("/api/admin/category-schema")
-def get_category_schema(category: str):
+def get_category_schema(category: str, current_admin: dict = Depends(get_current_admin)):
     from app.db import get_connection
     conn = get_connection()
     cur = conn.cursor()

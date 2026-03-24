@@ -343,7 +343,7 @@ export default function Components() {
                         else params.delete('q');
                         navigate(`?${params.toString()}`);
                     }}
-                    className="bg-white dark:bg-slate-900 border border-black dark:border-white/20 rounded-none py-1.5 px-3 text-[10px] font-black uppercase tracking-widest text-black dark:text-white placeholder:text-gray-300 dark:placeholder:text-slate-600 focus:border-blue-600 outline-none w-full md:w-48 transition-all"
+                    className="bg-white dark:bg-slate-900 border border-black dark:border-white/20 rounded-none py-1.5 px-3 text-[10px] font-black tracking-widest text-black dark:text-white placeholder:text-gray-300 dark:placeholder:text-slate-600 focus:border-blue-600 outline-none w-full md:w-48 transition-all"
                   />
                   <div className="hidden md:block">
                     <SortFilter />

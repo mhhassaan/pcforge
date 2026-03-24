@@ -37,13 +37,18 @@ def get_incomplete_products(category: str = None):
 
         # Get all products in this category that either:
         # 1. Have no specs entry
-        # 2. Have a specs entry with any NULL value (this is a bit complex for dynamic columns, so we'll check common ones)
+        # 2. Have a specs entry with any NULL value
         
-        # First, get columns for this specs table to check for NULLs
-        cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{specs_table}'")
+        # SQL Injection Prevention: table names cannot be parameterized, but we've validated 'specs_table' 
+        # against a fixed map of known table names.
+        
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = %s", (specs_table,))
         cols = [r[0] for r in cur.fetchall() if r[0] not in ['product_id', 'id']]
         
         null_checks = " OR ".join([f"s.{col} IS NULL" for col in cols])
+        
+        # Parameterize category placeholders
+        placeholders = ', '.join(['%s'] * len(db_categories))
         
         sql = f"""
         SELECT 
@@ -54,7 +59,7 @@ def get_incomplete_products(category: str = None):
             s.*
         FROM products p
         LEFT JOIN {specs_table} s ON p.product_id = s.product_id
-        WHERE p.category IN ({','.join(['%s'] * len(db_categories))})
+        WHERE p.category IN ({placeholders})
         AND (s.product_id IS NULL OR {null_checks})
         LIMIT 100;
         """
@@ -95,7 +100,7 @@ def update_product_specs(product_id: str, category: str, specs: dict):
     exists = cur.fetchone()
 
     # Clean specs dictionary of non-table columns if they sneaked in
-    cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{specs_table}'")
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = %s", (specs_table,))
     valid_cols = [r[0] for r in cur.fetchall()]
     
     filtered_specs = {k: v for k, v in specs.items() if k in valid_cols and k != 'product_id'}

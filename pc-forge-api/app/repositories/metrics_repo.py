@@ -2,6 +2,7 @@ from app.db import get_connection
 import psycopg2.extras
 
 def get_system_metrics():
+    # ... existing implementation ...
     conn = get_connection()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     
@@ -63,3 +64,24 @@ def get_system_metrics():
         "recent_activity": recent_activity,
         "recent_users": recent_users
     }
+
+def get_vendor_audit_metrics():
+    conn = get_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    
+    cur.execute("""
+        SELECT 
+            vendor,
+            COUNT(*) as product_count,
+            AVG(price) as avg_price,
+            MAX(last_updated) as latest_update,
+            MIN(last_updated) as oldest_update
+        FROM vendor_prices
+        GROUP BY vendor
+        ORDER BY latest_update DESC;
+    """)
+    
+    rows = [dict(row) for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return rows

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Cpu, Activity, ShieldCheck, Zap, Maximize, Layout } from 'lucide-react';
 import { MorphingText } from '../ui/MorphingText';
@@ -6,7 +6,10 @@ import { DottedMap } from '../ui/DottedMap';
 import { Highlighter } from '../ui/Highlighter';
 import { Safari } from '../ui/Safari';
 
-export default function Hero() {
+// Memoize heavy background component
+const MemoizedDottedMap = memo(DottedMap);
+
+function AiPromptBox() {
   const [aiInput, setAiInput] = useState("");
   const navigate = useNavigate();
 
@@ -18,11 +21,38 @@ export default function Hero() {
   };
 
   return (
+    <div className="pt-4 max-w-2xl relative group">
+      {/* Glow Effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-none blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+      
+      <form onSubmit={handleAiSubmit} className="relative bg-white dark:bg-slate-900 border-2 border-black dark:border-white/10 flex flex-col sm:flex-row items-stretch p-1 gap-1 shadow-[0_0_20px_rgba(37,99,235,0.1)] group-hover:shadow-[0_0_30px_rgba(37,99,235,0.2)] transition-shadow">
+        <div className="flex-1 flex items-center px-4">
+          <input 
+            type="text" 
+            value={aiInput}
+            onChange={(e) => setAiInput(e.target.value)}
+            placeholder="Build a 1080p gaming pc under 150k"
+            className="w-full bg-transparent border-none focus:ring-0 p-4 text-xs font-black tracking-tight dark:text-white placeholder:text-gray-300 dark:placeholder:text-slate-700 outline-none"
+          />
+        </div>
+        <button 
+          type="submit"
+          className="bg-black dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-black py-4 px-8 uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-3"
+        >
+          Forge <ArrowRight size={15} />
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function Hero() {
+  return (
     <section className="relative pt-20 pb-32 overflow-hidden bg-white dark:bg-[#0a0a0a] border-b-2 border-black dark:border-white/10 transition-colors duration-300">
       {/* Background Effect */}
       <div className="absolute inset-0 z-0 opacity-20 dark:opacity-10 pointer-events-none overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] scale-150">
-            <DottedMap 
+            <MemoizedDottedMap 
                 width={150}
                 height={100}
                 dotRadius={0.15}
@@ -69,28 +99,7 @@ export default function Hero() {
             </p>
 
             {/* AI Prompt Box - Compact & Glowing */}
-            <div className="pt-4 max-w-2xl relative group">
-              {/* Glow Effect */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-none blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
-              
-              <form onSubmit={handleAiSubmit} className="relative bg-white dark:bg-slate-900 border-2 border-black dark:border-white/10 flex flex-col sm:flex-row items-stretch p-1 gap-1 shadow-[0_0_20px_rgba(37,99,235,0.1)] group-hover:shadow-[0_0_30px_rgba(37,99,235,0.2)] transition-shadow">
-                <div className="flex-1 flex items-center px-4">
-                  <input 
-                    type="text" 
-                    value={aiInput}
-                    onChange={(e) => setAiInput(e.target.value)}
-                    placeholder="Build a 1080p gaming pc under 150k"
-                    className="w-full bg-transparent border-none focus:ring-0 p-4 text-xs font-black uppercase tracking-tight dark:text-white placeholder:text-gray-300 dark:placeholder:text-slate-700 outline-none"
-                  />
-                </div>
-                <button 
-                  type="submit"
-                  className="bg-black dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-black py-4 px-8 uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-3"
-                >
-                  Forge <ArrowRight size={15} />
-                </button>
-              </form>
-            </div>
+            <AiPromptBox />
           </div>
 
           {/* Right Visual: Component Specs in Safari Mockup */}

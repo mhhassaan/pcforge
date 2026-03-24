@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchIncompleteProducts, fetchCategorySchema, updateProductSpecs } from '../api/pcforge';
 import { 
@@ -11,7 +11,10 @@ import {
   CheckCircle2,
   Database,
   Lock,
-  ArrowLeft
+  ArrowLeft,
+  RotateCcw,
+  ExternalLink,
+  Info
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -24,34 +27,74 @@ const CATEGORIES = [
   { label: 'Storage', value: 'storage' },
 ];
 
+const getInputType = (colName: string) => {
+    const numericFields = ['price', 'wattage', 'tdp', 'clock', 'speed', 'capacity', 'size', 'pins', 'slots', 'bay', 'count', 'version'];
+    if (numericFields.some(f => colName.toLowerCase().includes(f))) return 'number';
+    return 'text';
+};
+
+interface Product {
+  product_id: string;
+  product_name: string;
+  manufacturer: string;
+  category: string;
+  main_category: string;
+  [key: string]: string | number | null | undefined;
+}
+
+interface SchemaColumn {
+  name: string;
+  type: string;
+}
+
 export default function AdminInventory() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [category, setCategory] = useState('cpu');
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [loading, setLoading] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<any | null>(null);
-  const [schema, setSchema] = useState<any[]>([]);
-  const [formData, setFormData] = useState<any>({});
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [schema, setSchema] = useState<SchemaColumn[]>([]);
+  const [formData, setFormData] = useState<Record<string, string | number>>({});
+  const [initialData, setInitialData] = useState<Record<string, string | number>>({});
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
   useEffect(() => {
-    const access = localStorage.getItem('admin_access');
-    if (access === 'true') {
-        setIsAdmin(true);
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('pcforge_user');
+    if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.is_admin) setIsAdmin(true);
     }
   }, []);
+
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchIncompleteProducts(category);
+      setProducts(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [category]);
 
   useEffect(() => {
     if (isAdmin) {
         loadProducts();
     }
-  }, [category, isAdmin]);
+  }, [isAdmin, loadProducts]);
 
   const filteredProducts = products.filter(p => 
-    p.product_name.toLowerCase().includes(search.toLowerCase()) ||
-    p.product_id.toLowerCase().includes(search.toLowerCase()) ||
-    p.manufacturer.toLowerCase().includes(search.toLowerCase())
+    p.product_name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    p.product_id.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    p.manufacturer.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   if (!isAdmin) {
@@ -71,35 +114,26 @@ export default function AdminInventory() {
     );
   }
 
-  const loadProducts = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchIncompleteProducts(category);
-      setProducts(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const startEditing = async (product: any) => {
+  const startEditing = async (product: Product) => {
     setEditingProduct(product);
     setSaveStatus('idle');
     try {
       const catSchema = await fetchCategorySchema(product.main_category);
       setSchema(catSchema);
       
-      // Initialize form with existing specs
-      const initialForm: any = {};
+      const initialForm: Record<string, string | number> = {};
       catSchema.forEach(col => {
-        initialForm[col.name] = product[col.name] ?? '';
+        const val = product[col.name];
+        initialForm[col.name] = (val !== null && val !== undefined) ? String(val) : '';
       });
       setFormData(initialForm);
+      setInitialData(initialForm);
     } catch (err) {
       console.error(err);
     }
   };
+
+  const resetForm = () => setFormData(initialData);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,8 +241,20 @@ export default function AdminInventory() {
                   ) : filteredProducts.map((product) => (
                     <tr key={product.product_id} className="hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors bg-white dark:bg-[#121212]">
                       <td className="p-4 border-r-2 border-black dark:border-white/10">
-                        <p className="text-xs font-black uppercase leading-tight dark:text-white">{product.product_name}</p>
-                        <p className="text-[9px] font-mono text-gray-400 dark:text-slate-600 mt-1">{product.product_id}</p>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-xs font-black uppercase leading-tight dark:text-white">{product.product_name}</p>
+                                <p className="text-[9px] font-mono text-gray-400 dark:text-slate-600 mt-1">{product.product_id}</p>
+                            </div>
+                            <a 
+                                href={`/components/${product.product_id}`} 
+                                target="_blank" 
+                                rel="noreferrer"
+                                className="text-gray-300 hover:text-blue-600 dark:text-slate-700 dark:hover:text-blue-400 transition-colors"
+                            >
+                                <ExternalLink size={12} />
+                            </a>
+                        </div>
                       </td>
                       <td className="p-4 border-r-2 border-black dark:border-white/10">
                         <span className="inline-block px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[9px] font-black uppercase tracking-tighter italic">
@@ -238,7 +284,7 @@ export default function AdminInventory() {
       {/* Editor Modal */}
       {editingProduct && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#121212] border-8 border-black dark:border-blue-600 w-full max-w-2xl shadow-[16px_16px_0px_0px_rgba(37,99,235,1)] dark:shadow-[16px_16px_0px_0px_rgba(37,99,235,0.3)] animate-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-[#121212] border-8 border-black dark:border-blue-600 w-full max-w-2xl shadow-[16px_16px_0px_0px_rgba(37,99,235,1)] dark:shadow-[16px_16px_0px_0px_rgba(37,99,235,0.3)] animate-in zoom-in-95 duration-200 my-8">
             <div className="p-6 border-b-4 border-black dark:border-white/10 flex justify-between items-center bg-black dark:bg-[#0a0a0a] text-white">
               <div className="flex items-center gap-3">
                 <Database size={20} className="text-blue-400" />
@@ -250,9 +296,30 @@ export default function AdminInventory() {
             </div>
             
             <form onSubmit={handleSave} className="p-8 space-y-8">
-              <div className="bg-gray-50 dark:bg-[#0a0a0a] border-2 border-black dark:border-white/10 p-4 space-y-1">
-                <p className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-widest">Target_Product</p>
-                <p className="text-lg font-black uppercase italic leading-tight dark:text-white">{editingProduct.product_name}</p>
+              <div className="bg-gray-50 dark:bg-[#0a0a0a] border-2 border-black dark:border-white/10 p-4 flex justify-between items-center">
+                <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-widest">Target_Product</p>
+                    <p className="text-lg font-black uppercase italic leading-tight dark:text-white">{editingProduct.product_name}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button 
+                        type="button"
+                        onClick={resetForm}
+                        className="p-2 border-2 border-black dark:border-white/10 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] transition-all text-gray-400 hover:text-black dark:hover:text-white"
+                        title="Reset to Initial"
+                    >
+                        <RotateCcw size={16} />
+                    </button>
+                    <a 
+                        href={`/components/${editingProduct.product_id}`} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="p-2 border-2 border-black dark:border-white/10 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] transition-all text-gray-400 hover:text-black dark:hover:text-white"
+                        title="Open Preview"
+                    >
+                        <ExternalLink size={16} />
+                    </a>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -260,15 +327,22 @@ export default function AdminInventory() {
                   <div key={col.name} className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-500 flex justify-between">
                       {col.name.replace(/_/g, ' ')}
-                      <span className="text-[8px] font-mono opacity-50">{col.type}</span>
+                      <span className="text-[8px] font-mono opacity-50 uppercase">{col.type}</span>
                     </label>
-                    <input 
-                      type="text" 
-                      className="w-full border-2 border-black dark:border-white/10 p-3 text-xs font-black uppercase outline-none bg-white dark:bg-[#0a0a0a] text-black dark:text-white focus:bg-blue-50 dark:focus:bg-[#1a1a1a] focus:border-blue-600 dark:focus:border-blue-500 transition-all"
-                      value={formData[col.name] || ''}
-                      onChange={e => setFormData({...formData, [col.name]: e.target.value})}
-                      placeholder={`Enter ${col.name}...`}
-                    />
+                    <div className="relative group">
+                        <input 
+                        type={getInputType(col.name)} 
+                        className="w-full border-2 border-black dark:border-white/10 p-3 text-xs font-black uppercase outline-none bg-white dark:bg-[#0a0a0a] text-black dark:text-white focus:bg-blue-50 dark:focus:bg-[#1a1a1a] focus:border-blue-600 dark:focus:border-blue-500 transition-all"
+                        value={formData[col.name] || ''}
+                        onChange={e => setFormData({...formData, [col.name]: e.target.value})}
+                        placeholder={`Enter ${col.name}...`}
+                        />
+                        {formData[col.name] === '' && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-500 opacity-50 group-hover:opacity-100 transition-opacity" title="Missing required data">
+                                <Info size={14} />
+                            </div>
+                        )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -280,11 +354,13 @@ export default function AdminInventory() {
                   className={`flex-1 py-4 font-black uppercase tracking-[0.3em] text-[10px] flex items-center justify-center gap-3 transition-all ${
                     saveStatus === 'saving' ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 dark:text-slate-600 cursor-not-allowed' :
                     saveStatus === 'success' ? 'bg-green-600 text-white' :
-                    'bg-black dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500'
+                    saveStatus === 'error' ? 'bg-red-600 text-white' :
+                    'bg-black dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]'
                   }`}
                 >
                   {saveStatus === 'saving' ? 'Synchronizing...' : 
                    saveStatus === 'success' ? <><CheckCircle2 size={16} /> Update_Confirmed</> :
+                   saveStatus === 'error' ? <><AlertTriangle size={16} /> Sync_Failed</> :
                    <><Save size={16} /> Commit_Changes</>}
                 </button>
                 <button 

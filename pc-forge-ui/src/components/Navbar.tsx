@@ -120,7 +120,7 @@ export default function Navbar() {
   // Check for admin status
   const userStr = localStorage.getItem('pcforge_user');
   const user = userStr ? JSON.parse(userStr) : null;
-  const isAdmin = user?.email?.endsWith('@pcforge.pk');
+  const isAdmin = user?.is_admin === true;
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -129,11 +129,10 @@ export default function Navbar() {
 
   const handleSignOut = () => {
     localStorage.removeItem('pcforge_user');
-    localStorage.removeItem('admin_access');
+    localStorage.removeItem('pcforge_token');
     navigate('/login');
     window.location.reload();
   };
-
   const navLinks: NavLink[] = [
     { name: 'Components', href: '/components', dropdown: true },
     { name: 'Builder', href: '/builder' },

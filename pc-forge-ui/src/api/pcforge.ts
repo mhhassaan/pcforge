@@ -197,28 +197,54 @@ export async function fetchMerchantPrices(productIds: string[]): Promise<any[]> 
 }
 
 export async function fetchAdminMetrics(): Promise<any> {
-  const res = await fetch(`${API}/api/admin/metrics`);
+  const token = localStorage.getItem("pcforge_token");
+  const res = await fetch(`${API}/api/admin/metrics`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error("Unauthorized");
+  return res.json();
+}
+
+export async function fetchVendorAudit(): Promise<any[]> {
+  const token = localStorage.getItem("pcforge_token");
+  const res = await fetch(`${API}/api/admin/vendor-audit`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error("Unauthorized");
   return res.json();
 }
 
 export async function fetchIncompleteProducts(category?: string): Promise<any[]> {
+  const token = localStorage.getItem("pcforge_token");
   const url = new URL(`${API}/api/admin/incomplete-products`);
   if (category) url.searchParams.append("category", category);
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error("Unauthorized");
   return res.json();
 }
 
 export async function fetchCategorySchema(category: string): Promise<any[]> {
-  const res = await fetch(`${API}/api/admin/category-schema?category=${category}`);
+  const token = localStorage.getItem("pcforge_token");
+  const res = await fetch(`${API}/api/admin/category-schema?category=${category}`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error("Unauthorized");
   return res.json();
 }
 
 export async function updateProductSpecs(payload: { product_id: string; category: string; specs: any }): Promise<any> {
+  const token = localStorage.getItem("pcforge_token");
   const res = await fetch(`${API}/api/admin/update-specs`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    },
     body: JSON.stringify(payload),
   });
+  if (!res.ok) throw new Error("Unauthorized");
   return res.json();
 }
 

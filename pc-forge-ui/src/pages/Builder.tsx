@@ -336,7 +336,7 @@ export default function Builder() {
                                         value={aiPrompt}
                                         onChange={(e) => setAiPrompt(e.target.value)}
                                         placeholder="What kind of PC are we building today?"
-                                        className="flex-1 bg-white dark:bg-slate-950 border-2 border-black dark:border-white/10 p-4 text-sm font-bold uppercase tracking-tight focus:border-blue-600 outline-none resize-none min-h-[80px]"
+                                        className="flex-1 bg-white dark:bg-slate-950 border-2 border-black dark:border-white/10 p-4 text-sm font-bold tracking-tight focus:border-blue-600 outline-none resize-none min-h-[80px]"
                                     />
                                     <button
                                         onClick={handleAIBuild}

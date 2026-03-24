@@ -40,9 +40,7 @@ export default function Auth() {
         
         clearTimeout(timeoutId);
 
-        console.log("Response status:", res.status);
         const data = await res.json();
-        console.log("Response data:", data);
 
         if (!res.ok) {
             throw new Error(data.detail || "Authentication failed");
@@ -50,6 +48,7 @@ export default function Auth() {
 
         if (isLogin) {
             localStorage.setItem("pcforge_user", JSON.stringify(data.user));
+            localStorage.setItem("pcforge_token", data.access_token);
             navigate("/");
         } else {
             alert("Registration successful! Please login.");
@@ -110,7 +109,7 @@ export default function Auth() {
                     required
                     type="text" 
                     placeholder="BUILDER_01"
-                    className="w-full border-2 border-black dark:border-white/10 p-4 pl-12 text-sm font-black uppercase tracking-tight bg-white dark:bg-slate-950 text-black dark:text-white focus:bg-gray-50 dark:focus:bg-slate-900 outline-none transition-all"
+                    className="w-full border-2 border-black dark:border-white/10 p-4 pl-12 text-sm font-black tracking-tight bg-white dark:bg-slate-950 text-black dark:text-white focus:bg-gray-50 dark:focus:bg-slate-900 outline-none transition-all"
                     value={formData.username}
                     onChange={e => setFormData({...formData, username: e.target.value})}
                   />
@@ -126,7 +125,7 @@ export default function Auth() {
                   required
                   type="email" 
                   placeholder="arch@pcforge.pk"
-                  className="w-full border-2 border-black dark:border-white/10 p-4 pl-12 text-sm font-black uppercase tracking-tight bg-white dark:bg-slate-950 text-black dark:text-white focus:bg-gray-50 dark:focus:bg-slate-900 outline-none transition-all"
+                  className="w-full border-2 border-black dark:border-white/10 p-4 pl-12 text-sm font-black tracking-tight bg-white dark:bg-slate-950 text-black dark:text-white focus:bg-gray-50 dark:focus:bg-slate-900 outline-none transition-all"
                   value={formData.email}
                   onChange={e => setFormData({...formData, email: e.target.value})}
                 />
@@ -141,7 +140,7 @@ export default function Auth() {
                   required
                   type="password" 
                   placeholder="********"
-                  className="w-full border-2 border-black dark:border-white/10 p-4 pl-12 text-sm font-black uppercase tracking-tight bg-white dark:bg-slate-950 text-black dark:text-white focus:bg-gray-50 dark:focus:bg-slate-900 outline-none transition-all"
+                  className="w-full border-2 border-black dark:border-white/10 p-4 pl-12 text-sm font-black tracking-tight bg-white dark:bg-slate-950 text-black dark:text-white focus:bg-gray-50 dark:focus:bg-slate-900 outline-none transition-all"
                   value={formData.password}
                   onChange={e => setFormData({...formData, password: e.target.value})}
                 />

@@ -20,14 +20,6 @@ export function ScrollProgress({
 }: ScrollProgressProps) {
   const { scrollYProgress } = useScroll(container ? { container } : {})
 
-  // Debug: Monitor scroll progress in console to ensure it's firing
-  useEffect(() => {
-    return scrollYProgress.on("change", (v) => {
-      // Small log to confirm tracking without spamming
-      if (v > 0 && v < 0.01) console.log("Scroll Progress Active");
-    })
-  }, [scrollYProgress])
-
   return (
     <motion.div
       ref={ref}
