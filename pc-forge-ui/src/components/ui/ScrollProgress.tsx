@@ -2,7 +2,6 @@
 
 import { motion, useScroll, type MotionProps } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { useEffect } from "react"
 
 interface ScrollProgressProps extends Omit<
   React.HTMLAttributes<HTMLElement>,

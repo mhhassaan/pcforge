@@ -137,6 +137,7 @@ export default function AdminInventory() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editingProduct) return;
     setSaveStatus('saving');
     try {
       await updateProductSpecs({
