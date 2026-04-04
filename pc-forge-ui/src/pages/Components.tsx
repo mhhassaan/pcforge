@@ -108,12 +108,12 @@ export default function Components() {
         }
 
         // Standardize the ID field
-        const standardizedData = data.map(item => ({
+        const standardizedData = Array.isArray(data) ? data.map(item => ({
             ...item,
             id: item.product_id || item.id,
             name: item.product_name || item.name,
             category: item.category || category
-        }));
+        })) : [];
 
         setComponents(standardizedData);
         setSelectedComponent(null);

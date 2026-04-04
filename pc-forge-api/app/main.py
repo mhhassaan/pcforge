@@ -177,6 +177,29 @@ def get_version_diff(build_id: int, v1: int, v2: int):
 def fetch_category_counts():
     return get_category_counts()
 
+@app.get("/api/components")
+def fetch_components(
+    category: str, 
+    q: str = None, 
+    sort_by: str = None, 
+    order: str = "asc",
+    request: Request = None
+):
+    # Get all query parameters to extract filters
+    params = dict(request.query_params)
+    
+    # Standard parameters to exclude from filters
+    standard_params = ["category", "q", "sort_by", "order"]
+    
+    # Extract filters (any parameter not in standard_params)
+    filters = {}
+    for key, value in params.items():
+        if key not in standard_params and value:
+            # Handle multiple values if they are comma-separated
+            filters[key] = value.split(",")
+            
+    return get_components_by_category(category, q, filters, sort_by, order)
+
 @app.get("/api/components/filters")
 def fetch_component_filters(category: str):
     return get_filter_options(category)
